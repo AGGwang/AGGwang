@@ -1,0 +1,19 @@
+<!--pages/inputpage/inputpage.wxml-->
+<view class="container">
+  <view class="form-group">
+    <view class="label">目标职业</view>
+    <input class="input" placeholder="例如：软件工程师、医生、律师" data-field="targetCareer" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">当前分数 (或预估分)</view>
+    <input class="input" type="number" placeholder="例如：580" data-field="score" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">个人情况简介</view>
+    <textarea class="textarea" placeholder="请简要描述你的兴趣、擅长科目、性格特点等，帮助AI更精准分析..." data-field="personalInfo" bindinput="onInput"></textarea>
+  </view>
+
+  <button class="submit-btn" bindtap="submitForm">生成规划报告</button>
+</view>

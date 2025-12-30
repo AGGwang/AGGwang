@@ -1,0 +1,24 @@
+<!-- index.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">AI 选科与职业规划</text>
+    <text class="subtitle">基于大数据与 AI 深度分析，为你定制未来</text>
+  </view>
+  <view class="content">
+    <view class="feature-item">
+      <text class="icon">🎯</text>
+      <text class="desc">精准职业定位</text>
+    </view>
+    <view class="feature-item">
+      <text class="icon">📊</text>
+      <text class="desc">科学选科建议</text>
+    </view>
+    <view class="feature-item">
+      <text class="icon">🚀</text>
+      <text class="desc">个性化成长路径</text>
+    </view>
+  </view>
+  <view class="footer">
+    <button class="start-btn" bindtap="startAssessment">开始评估</button>
+  </view>
+</view>

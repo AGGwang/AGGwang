@@ -1,0 +1,32 @@
+<!-- pages/mine/mine.wxml -->
+<view class="container">
+    <view class="user-card">
+        <view class="avatar-box">
+            <!-- 简单展示，实际需配合 wx.getUserProfile -->
+            <view class="avatar-placeholder">👤</view>
+        </view>
+        <view class="user-info">
+            <text class="nickname">微信用户</text>
+            <text class="uid">ID: {{openid || '...'}}</text>
+        </view>
+    </view>
+    <view class="section-title">我的测评记录</view>
+    <view class="record-list">
+        <block wx:if="{{records.length === 0}}">
+            <view class="empty-tip">暂无记录，快去首页体验吧</view>
+        </block>
+        <block wx:else>
+            <view class="record-item" wx:for="{{records}}" wx:key="_id" bindtap="goToResult" data-id="{{item._id}}">
+                <view class="record-main">
+                    <text class="record-title">{{item.targetCareer}}</text>
+                    <text class="record-date">{{item.createTimeStr}}</text>
+                </view>
+                <view class="record-status">
+                    <text class="status-tag {{item.isPaid ? 'paid' : 'unpaid'}}">
+                        {{item.isPaid ? '已解锁' : '未解锁'}}
+                    </text>
+                </view>
+            </view>
+        </block>
+    </view>
+</view>

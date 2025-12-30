@@ -1,0 +1,34 @@
+<!-- pages/result/result.wxml -->
+<view class="container">
+    <block wx:if="{{loading}}">
+        <view class="loading">加载中...</view>
+    </block>
+    <block wx:else>
+        <view class="report-card">
+            <view class="report-header">
+                <text class="career-title">{{record.targetCareer}} 职业规划</text>
+                <text class="score-tag">当前分数: {{record.score}}</text>
+            </view>
+            <view class="report-content">
+                <text class="content-text" selectable="true">
+                    {{isPaid ? record.fullContent : record.summary}}
+                </text>
+            </view>
+            <block wx:if="{{!isPaid}}">
+                <view class="blur-mask"></view>
+                <view class="lock-section">
+                    <view class="lock-tip">解锁查看完整 3000字+ 深度规划报告</view>
+                    <view class="price-box">
+                        <text class="original-price">¥{{record.originalPrice || 19.9}}</text>
+                        <text class="current-price">¥{{record.price || 5.99}}</text>
+                    </view>
+                    <button class="unlock-btn" bindtap="handlePay">立即解锁</button>
+                    <!-- 开发测试用 -->
+                    <button class="dev-btn" bindtap="devUnlock" style="margin-top: 20rpx; font-size: 24rpx; background: #eee; color: #666;">
+                        [开发测试] 模拟支付成功
+                    </button>
+                </view>
+            </block>
+        </view>
+    </block>
+</view>

@@ -1,0 +1,104 @@
+/* pages/result/result.wxss */
+.container {
+  padding: 30rpx;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.report-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+  min-height: 80vh;
+}
+
+.report-header {
+  border-bottom: 1rpx solid #eee;
+  padding-bottom: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.career-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.score-tag {
+  font-size: 26rpx;
+  color: #666;
+  background: #f0f0f0;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin-top: 16rpx;
+  display: inline-block;
+}
+
+.report-content {
+  font-size: 30rpx;
+  line-height: 1.8;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.blur-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 400rpx;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1) 40%);
+  z-index: 10;
+}
+
+.lock-section {
+  position: absolute;
+  bottom: 40rpx;
+  left: 40rpx;
+  right: 40rpx;
+  background: #fff;
+  z-index: 20;
+  text-align: center;
+  padding-top: 20rpx;
+}
+
+.lock-tip {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.price-box {
+  margin-bottom: 30rpx;
+}
+
+.original-price {
+  font-size: 28rpx;
+  color: #999;
+  text-decoration: line-through;
+  margin-right: 20rpx;
+}
+
+.current-price {
+  font-size: 48rpx;
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.unlock-btn {
+  background: linear-gradient(135deg, #ff7875, #ff4d4f);
+  color: white;
+  border-radius: 50rpx;
+  font-weight: bold;
+  box-shadow: 0 8rpx 20rpx rgba(255, 77, 79, 0.3);
+}
+
+.loading {
+  text-align: center;
+  margin-top: 100rpx;
+  color: #999;
+}

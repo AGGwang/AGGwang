@@ -1,0 +1,67 @@
+/** index.wxss */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 100rpx 40rpx;
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.content {
+  margin: 60rpx 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.desc {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.start-btn {
+  background-color: #0052d9;
+  color: white;
+  border-radius: 50rpx;
+  padding: 20rpx 0;
+  font-size: 36rpx;
+  width: 100%;
+  font-weight: bold;
+  box-shadow: 0 8rpx 20rpx rgba(0,82,217,0.3);
+}
+
+.start-btn:active {
+  background-color: #003bb3;
+}
