@@ -1,0 +1,4 @@
+<t-tab-bar value="{{value}}" bindchange="onChange" theme="tag" split="{{false}}">
+  <t-tab-bar-item value="pages/index/index" icon="home">首页</t-tab-bar-item>
+  <t-tab-bar-item value="pages/mine/mine" icon="user">我的</t-tab-bar-item>
+</t-tab-bar>

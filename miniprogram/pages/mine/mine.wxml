@@ -1,32 +1,59 @@
 <!-- pages/mine/mine.wxml -->
 <view class="container">
-    <view class="user-card">
-        <view class="avatar-box">
-            <!-- 简单展示，实际需配合 wx.getUserProfile -->
-            <view class="avatar-placeholder">👤</view>
+    <!-- 未登录状态 -->
+    <view class="login-container" wx:if="{{!isLogged}}">
+        <view class="logo-box">
+            <image class="app-logo" src="/images/home_active.png" mode="aspectFit"></image>
+            <text class="app-name">AI 选科与职业规划</text>
         </view>
-        <view class="user-info">
-            <text class="nickname">微信用户</text>
-            <text class="uid">ID: {{openid || '...'}}</text>
-        </view>
+        <button class="login-btn" bindtap="handleLogin">
+            <t-icon name="logo-wechat" size="40rpx" color="#fff" style="margin-right: 16rpx;" />
+            微信一键登录
+        </button>
+        <text class="login-tip">登录后查看历史测评记录</text>
     </view>
-    <view class="section-title">我的测评记录</view>
-    <view class="record-list">
-        <block wx:if="{{records.length === 0}}">
-            <view class="empty-tip">暂无记录，快去首页体验吧</view>
-        </block>
-        <block wx:else>
-            <view class="record-item" wx:for="{{records}}" wx:key="_id" bindtap="goToResult" data-id="{{item._id}}">
-                <view class="record-main">
-                    <text class="record-title">{{item.targetCareer}}</text>
-                    <text class="record-date">{{item.createTimeStr}}</text>
-                </view>
-                <view class="record-status">
-                    <text class="status-tag {{item.isPaid ? 'paid' : 'unpaid'}}">
-                        {{item.isPaid ? '已解锁' : '未解锁'}}
-                    </text>
-                </view>
+    <!-- 已登录状态 -->
+    <block wx:else>
+        <view class="user-card">
+            <view class="avatar-box">
+                <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+                    <image wx:if="{{userInfo.avatarUrl}}" class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+                    <view wx:else class="avatar-placeholder">
+                        <t-icon name="user" size="60rpx" color="#999" />
+                    </view>
+                    <view class="camera-icon">📷</view>
+                </button>
             </view>
-        </block>
-    </view>
+            <view class="user-info">
+                <input type="nickname" class="nickname-input" placeholder="点击输入昵称" value="{{userInfo.nickName}}" bind:change="onNicknameChange" bind:blur="onNicknameBlur" />
+                <text class="uid" bindtap="copyOpenId">ID: {{openid || '...'}} (点击复制)</text>
+                <view class="save-hint" wx:if="{{needSave}}">记得保存哦 ➡️</view>
+            </view>
+            <view class="action-box" wx:if="{{needSave}}">
+                <button class="save-btn" size="mini" bindtap="saveUserInfo">保存</button>
+            </view>
+        </view>
+        <view class="section-title">我的测评记录</view>
+        <view class="record-list">
+            <block wx:if="{{records.length === 0}}">
+                <view class="empty-tip">暂无记录，快去首页体验吧</view>
+            </block>
+            <block wx:else>
+                <view class="record-item" wx:for="{{records}}" wx:key="_id" bindtap="goToResult" data-id="{{item._id}}">
+                    <view class="record-main">
+                        <text class="record-title">{{item.targetCareer}}</text>
+                        <text class="record-date">{{item.createTimeStr}}</text>
+                    </view>
+                    <view class="record-status">
+                        <text class="status-tag {{item.isPaid ? 'paid' : 'unpaid'}}">
+                            {{item.isPaid ? '已解锁' : '未解锁'}}
+                        </text>
+                    </view>
+                </view>
+            </block>
+        </view>
+        <view class="logout-area">
+            <text class="logout-text" bindtap="handleLogout">退出登录</text>
+        </view>
+    </block>
 </view>

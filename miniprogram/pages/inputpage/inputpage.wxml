@@ -1,19 +1,49 @@
-<!--pages/inputpage/inputpage.wxml-->
+<!-- pages/inputpage/inputpage.wxml -->
 <view class="container">
+  <view class="header-guide">
+    <text class="guide-title">完善信息</text>
+    <text class="guide-desc">请提供真实的学习情况，AI 将为你定制更精准的规划</text>
+  </view>
   <view class="form-group">
     <view class="label">目标职业</view>
     <input class="input" placeholder="例如：软件工程师、医生、律师" data-field="targetCareer" bindinput="onInput" />
   </view>
-
   <view class="form-group">
-    <view class="label">当前分数 (或预估分)</view>
-    <input class="input" type="number" placeholder="例如：580" data-field="score" bindinput="onInput" />
+    <view class="label">各科分数 (7选3)</view>
+    <view class="score-grid">
+      <view class="score-item">
+        <text class="subject-name">物理</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="physics" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">化学</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="chemistry" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">生物</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="biology" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">政治</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="politics" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">历史</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="history" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">地理</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="geography" bindinput="onScoreInput" />
+      </view>
+      <view class="score-item">
+        <text class="subject-name">技术</text>
+        <input class="score-input" type="number" placeholder="分数" data-subject="technology" bindinput="onScoreInput" />
+      </view>
+    </view>
   </view>
-
   <view class="form-group">
     <view class="label">个人情况简介</view>
     <textarea class="textarea" placeholder="请简要描述你的兴趣、擅长科目、性格特点等，帮助AI更精准分析..." data-field="personalInfo" bindinput="onInput"></textarea>
   </view>
-
   <button class="submit-btn" bindtap="submitForm">生成规划报告</button>
 </view>

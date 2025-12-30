@@ -11,7 +11,11 @@
     "navigationBarTitleText": "AI 选科与职业规划",
     "navigationBarBackgroundColor": "#ffffff"
   },
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  },
   "tabBar": {
+    "custom": true,
     "color": "#999999",
     "selectedColor": "#0052d9",
     "backgroundColor": "#ffffff",

@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 100rpx 40rpx;
+  padding: 100rpx 40rpx 240rpx;
   box-sizing: border-box;
   background-color: #f8f9fa;
 }
@@ -37,7 +37,7 @@
   padding: 30rpx;
   border-radius: 16rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .icon {
@@ -59,7 +59,7 @@
   font-size: 36rpx;
   width: 100%;
   font-weight: bold;
-  box-shadow: 0 8rpx 20rpx rgba(0,82,217,0.3);
+  box-shadow: 0 8rpx 20rpx rgba(0, 82, 217, 0.3);
 }
 
 .start-btn:active {

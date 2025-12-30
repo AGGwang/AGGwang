@@ -6,15 +6,15 @@
   </view>
   <view class="content">
     <view class="feature-item">
-      <text class="icon">🎯</text>
+      <t-icon name="location" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
       <text class="desc">精准职业定位</text>
     </view>
     <view class="feature-item">
-      <text class="icon">📊</text>
+      <t-icon name="chart" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
       <text class="desc">科学选科建议</text>
     </view>
     <view class="feature-item">
-      <text class="icon">🚀</text>
+      <t-icon name="rocket" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
       <text class="desc">个性化成长路径</text>
     </view>
   </view>
