@@ -1,4 +1,6 @@
 // pages/inputpage/inputpage.js
+const aiService = require('../../services/ai')
+const auth = require('../../services/auth')
 Page({
     data: {
         targetCareer: '',
@@ -29,6 +31,9 @@ Page({
         })
     },
 
+    /**
+     * 提交并触发前端流式生成
+     */
     async submitForm() {
         const { targetCareer, scores, personalInfo } = this.data
 
@@ -61,36 +66,21 @@ Page({
       技术: ${scores.technology || 0}
     `
 
-        wx.showLoading({
-            title: 'AI 正在分析...',
-            mask: true
-        })
-
         try {
-            const res = await wx.cloud.callFunction({
-                name: 'ai_generate',
-                data: {
-                    targetCareer,
-                    score: scoreStr, // 将详细分数传给后端
-                    personalInfo
-                }
-            })
-
-            wx.hideLoading()
-
-            if (res.result && res.result.success) {
-                wx.navigateTo({
-                    url: `/pages/result/result?id=${res.result.recordId}`
-                })
-            } else {
-                throw new Error(res.result?.errMsg || '生成失败')
-            }
+            // 生成前校验登录
+            await auth.ensureLogin()
+            const payload = encodeURIComponent(JSON.stringify({
+                targetCareer,
+                scoreDetail: scoreStr,
+                personalInfo,
+                partialEndIndex: 240
+            }))
+            wx.navigateTo({ url: `/pages/result/result?payload=${payload}` })
         } catch (err) {
-            wx.hideLoading()
             console.error(err)
             wx.showModal({
-                title: '生成失败',
-                content: err.message || '服务暂时不可用，请稍后重试',
+                title: '跳转失败',
+                content: err.message || '请稍后重试',
                 showCancel: false
             })
         }

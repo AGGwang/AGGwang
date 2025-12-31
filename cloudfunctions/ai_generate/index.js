@@ -1,34 +1,17 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
-
-cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
-
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
 /**
- * 调用微信云开发 AI 能力生成职业规划报告
- * 
- * @param {string} targetCareer - 目标职业
- * @param {string} score - 分数详情字符串
- * @param {string} personalInfo - 个人情况描述
- * @returns {Promise<{fullContent: string, summary: string}>} AI 生成的完整报告和摘要
+ * 构建提示词
+ * @param {string} targetCareer 目标职业
+ * @param {string} score 各科分数详情
+ * @param {string} personalInfo 个人情况简介
+ * @returns {string} 大模型输入提示词
  */
-async function callAI(targetCareer, score, personalInfo) {
-  try {
-    // 1. 获取 AI 实例
-    // 注意：请确保你的云环境已开通 AI 能力，并且 wx-server-sdk 为最新版本
-    const ai = cloud.extend.AI
-    if (!ai) {
-      throw new Error('当前环境不支持 cloud.extend.AI，请升级 wx-server-sdk 或检查环境配置')
-    }
-
-    // 2. 指定模型
-    // 'deepseek-r1' 仅为示例，请在微信云开发控制台 -> AI 能力中确认你已开通的模型 ID
-    const modelName = 'deepseek-r1'
-    const aiModel = ai.createModel(modelName)
-
-    // 3. 构造 Prompt
-    const prompt = `
+function buildPrompt(targetCareer, score, personalInfo) {
+  return `
 你是一位资深的高考志愿填报与职业规划专家。
 请根据以下学生信息生成一份详细的职业规划报告。
 
@@ -43,68 +26,75 @@ async function callAI(targetCareer, score, personalInfo) {
 2. "summary": string 类型。一份报告摘要，Markdown 格式，简要包含现状和选科推荐，并在末尾提示"(更多详细学习路径及职业前景分析请解锁查看)"。
 
 请确保内容专业、客观且具有指导意义。
-    `
+  `
+}
 
-    // 4. 调用生成
-    const res = await aiModel.generateText({
-      data: {
-        model: modelName,
-        messages: [
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7
-      }
-    })
+/**
+ * 以官方示例方式（streamText + textStream/eventStream）调用混元模型生成报告
+ * @param {string} targetCareer 目标职业
+ * @param {string} score 各科分数详情字符串
+ * @param {string} personalInfo 个人情况描述
+ * @returns {Promise<{fullContent: string, summary: string}>} AI 生成的完整报告和摘要
+ */
+async function callAI(targetCareer, score, personalInfo) {
+  const ai = cloud.extend && cloud.extend.AI
+  if (!ai) {
+    throw new Error('当前环境不支持 cloud.extend.AI，请升级 wx-server-sdk 或检查环境配置')
+  }
 
-    console.log('AI Response:', res)
-
-    // 5. 解析结果
-    // 尝试解析 JSON，如果失败则进行容错处理
-    let result
-    try {
-      // 某些模型可能会返回 ```json ... ``` 格式，需要清洗
-      const cleanJson = typeof res === 'string' ? res.replace(/```json/g, '').replace(/```/g, '').trim() : JSON.stringify(res)
-
-      // 如果 res 本身就是对象（取决于 SDK 版本），则直接使用
-      if (typeof res === 'object' && res.choices && res.choices[0].message) {
-        const content = res.choices[0].message.content
-        const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim()
-        result = JSON.parse(cleanContent)
-      } else {
-        result = JSON.parse(cleanJson)
-      }
-    } catch (e) {
-      console.warn('AI 返回非标准 JSON，降级处理', e)
-      const rawText = typeof res === 'string' ? res : JSON.stringify(res)
-      result = {
-        fullContent: rawText,
-        summary: rawText.substring(0, 100) + '...\n\n(更多详细学习路径及职业前景分析请解锁查看)'
-      }
+  // 创建模型组并指定具体模型
+  const model = ai.createModel('hunyuan-exp')
+  const res = await model.streamText({
+    data: {
+      model: 'hunyuan-t1-latest',
+      messages: [
+        { role: 'user', content: buildPrompt(targetCareer, score, personalInfo) }
+      ],
+      temperature: 0.7
     }
+  })
 
+  // 接收文本流
+  let fullText = ''
+  for await (let str of res.textStream) {
+    fullText += str
+  }
+
+  // 接收事件流（便于排障与统计），不影响业务返回
+  for await (let event of res.eventStream) {
+    // 可按需记录：finish_reason、usage 等
+    console.log('AI Event:', event && event.type ? event.type : event)
+  }
+
+  // 解析 JSON 结构；若解析失败则降级
+  try {
+    const clean = fullText.replace(/```json/g, '').replace(/```/g, '').trim()
+    const parsed = JSON.parse(clean)
     return {
-      fullContent: result.fullContent || '生成失败',
-      summary: result.summary || '生成失败'
+      fullContent: parsed.fullContent,
+      summary: parsed.summary
     }
-
-  } catch (err) {
-    console.error('AI 调用失败:', err)
-    // 如果 AI 调用失败，为了不让用户卡住，可以返回一个模拟的错误提示或降级数据
-    // 这里选择抛出错误，让前端感知
-    throw new Error('AI 服务暂时不可用: ' + err.message)
+  } catch (e) {
+    console.warn('AI 返回非标准 JSON，采用降级处理', e)
+    return {
+      fullContent: fullText,
+      summary: (fullText || '').substring(0, 200) + '\n\n(更多详细学习路径及职业前景分析请解锁查看)'
+    }
   }
 }
 
-// 云函数入口函数
+/**
+ * 云函数入口：生成报告并落库，返回摘要与记录ID
+ * @param {{targetCareer:string, score:string, personalInfo:string}} event 入参
+ * @returns {{success:boolean, recordId?:string, summary?:string, price?:number, originalPrice?:number, errMsg?:string}}
+ */
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { targetCareer, score, personalInfo } = event
 
   try {
-    // 1. 调用 AI
     const aiResult = await callAI(targetCareer, score, personalInfo)
 
-    // 2. 存入数据库
     const record = {
       _openid: wxContext.OPENID,
       targetCareer,
@@ -118,21 +108,17 @@ exports.main = async (event, context) => {
       createTime: db.serverDate()
     }
 
-    const res = await db.collection('records').add({
-      data: record
-    })
+    const addRes = await db.collection('records').add({ data: record })
 
-    // 3. 返回结果 (只返回摘要和ID)
     return {
       success: true,
-      recordId: res._id,
+      recordId: addRes._id,
       summary: aiResult.summary,
       price: record.price,
       originalPrice: record.originalPrice
     }
-
   } catch (err) {
-    console.error(err)
+    console.error('AI 生成失败:', err)
     return {
       success: false,
       errMsg: err.message

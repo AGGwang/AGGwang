@@ -1,6 +1,20 @@
 <!-- pages/result/result.wxml -->
 <view class="container">
-    <block wx:if="{{loading}}">
+    <block wx:if="{{generating}}">
+        <view class="generating-card">
+            <view class="gen-header">
+                <text class="gen-title">AI 正在生成 {{record.targetCareer}} 职业规划</text>
+                <view class="gen-sub">实时输出（仅展示部分内容，更多需解锁）</view>
+            </view>
+            <view class="gen-content">
+                <text class="content-text">{{record.summary}}</text>
+            </view>
+            <view class="progress-bar">
+                <view class="progress-inner"></view>
+            </view>
+        </view>
+    </block>
+    <block wx:elif="{{loading}}">
         <view class="loading">加载中...</view>
     </block>
     <block wx:else>
@@ -9,26 +23,38 @@
                 <text class="career-title">{{record.targetCareer}} 职业规划</text>
                 <text class="score-tag">当前分数: {{record.score}}</text>
             </view>
-            <view class="report-content">
-                <text class="content-text" selectable="true">
-                    {{isPaid ? record.fullContent : record.summary}}
-                </text>
-            </view>
+            <scroll-view class="content-scroll" scroll-y="true">
+                <text class="content-text">{{isPaid ? record.fullContent : record.summary}}</text>
+                <block wx:if="{{!isPaid}}">
+                    <view class="blur-placeholder">
+                        <text>以下内容需解锁查看...</text>
+                        <text>详细学习路径规划...</text>
+                        <text>未来职业前景分析...</text>
+                        <text>专业选科建议...</text>
+                        <text>...</text>
+                    </view>
+                    <view class="gauss-mask"></view>
+                </block>
+            </scroll-view>
             <block wx:if="{{!isPaid}}">
-                <view class="blur-mask"></view>
                 <view class="lock-section">
-                    <view class="lock-tip">解锁查看完整 3000字+ 深度规划报告</view>
+                    <view class="lock-tip">已为你实时展示部分内容，解锁查看完整 3000字+ 深度规划报告</view>
                     <view class="price-box">
                         <text class="original-price">¥{{record.originalPrice || 19.9}}</text>
                         <text class="current-price">¥{{record.price || 5.99}}</text>
                     </view>
                     <button class="unlock-btn" bindtap="handlePay">立即解锁</button>
-                    <!-- 开发测试用 -->
-                    <button class="dev-btn" bindtap="devUnlock" style="margin-top: 20rpx; font-size: 24rpx; background: #eee; color: #666;">
-                        [开发测试] 模拟支付成功
-                    </button>
                 </view>
             </block>
         </view>
+        <block wx:if="{{!isPaid}}">
+            <view class="pay-footer">
+                <view class="footer-box">
+                    <view class="footer-text">解锁查看完整报告</view>
+                    <view class="footer-price">¥{{record.price || 5.99}}</view>
+                    <button class="footer-btn" bindtap="handlePay">立即解锁</button>
+                </view>
+            </view>
+        </block>
     </block>
 </view>

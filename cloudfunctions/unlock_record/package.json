@@ -1,7 +1,7 @@
 {
     "name": "unlock_record",
     "version": "1.0.0",
-    "description": "",
+    "description": "Unlock paid report content",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,6 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "wx-server-sdk": "~2.6.3"
+        "wx-server-sdk": "latest"
     }
 }
