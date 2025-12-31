@@ -50,45 +50,25 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, o
   }
 
   try {
-    for await (let event of res.eventStream) {
-      let piece = ''
-      if (typeof event === 'string') {
-        piece = event
-      } else if (event && event.choices && event.choices[0] && event.choices[0].delta && event.choices[0].delta.content) {
-        piece = event.choices[0].delta.content
-      } else if (event && event.data && typeof event.data.output_text === 'string') {
-        piece = event.data.output_text
-      } else if (event && typeof event.content === 'string') {
-        piece = event.content
-      }
-      if (!piece) continue
+    for await (let str of res.textStream) {
+      console.log('Stream chunk:', str) // Debug log
+      const piece = toString(str)
       fullText += piece
       throttledBuffer += piece
+
       if (typeof onText === 'function') {
+        // 使用更频繁的更新频率以提升流畅度
         if (!throttleTimer) {
           throttleTimer = setTimeout(() => {
             onText(throttledBuffer)
             throttledBuffer = ''
             throttleTimer = null
-          }, 80)
+          }, 50)
         }
       }
     }
   } catch (e) {
-    for await (let str of res.textStream) {
-      const piece = toString(str)
-      fullText += piece
-      throttledBuffer += piece
-      if (typeof onText === 'function') {
-        if (!throttleTimer) {
-          throttleTimer = setTimeout(() => {
-            onText(throttledBuffer)
-            throttledBuffer = ''
-            throttleTimer = null
-          }, 80)
-        }
-      }
-    }
+    console.error('Stream processing error:', e)
   }
   if (throttleTimer && typeof onText === 'function' && throttledBuffer) {
     onText(throttledBuffer)

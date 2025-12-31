@@ -1,3 +1,8 @@
 {
-    "navigationBarTitleText": "规划报告"
+    "navigationBarTitleText": "规划报告",
+    "usingComponents": {
+        "t-icon": "tdesign-miniprogram/icon/icon",
+        "t-button": "tdesign-miniprogram/button/button",
+        "t-loading": "tdesign-miniprogram/loading/loading"
+    }
 }
