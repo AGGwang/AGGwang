@@ -42,8 +42,8 @@ Page({
         try {
             const res = await db.collection('records').doc(id).get()
             const data = res.data
-            const displayText = data.isPaid 
-                ? data.fullContent 
+            const displayText = data.isPaid
+                ? data.fullContent
                 : (data.fullContent || '').substring(0, FREE_PREVIEW_LENGTH) + '...'
             this.setData({
                 record: data,

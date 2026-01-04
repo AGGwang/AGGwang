@@ -3,5 +3,6 @@
   "projectname": "7in3",
   "setting": {
     "compileHotReLoad": true
-  }
+  },
+  "libVersion": "3.13.0"
 }

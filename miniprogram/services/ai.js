@@ -31,16 +31,48 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, o
   })
 
   let fullText = ''
+  let lastChunkTime = Date.now()
+  let streamEnded = false
 
-  // 使用 textStream 接收流式响应
-  for await (let str of res.textStream) {
-    fullText += str
-    if (typeof onText === 'function') {
-      onText(str)
+  // 流式读取
+  const readStream = async () => {
+    try {
+      for await (let str of res.textStream) {
+        lastChunkTime = Date.now()
+        fullText += str
+        if (typeof onText === 'function') {
+          onText(str)
+        }
+      }
+      streamEnded = true
+    } catch (err) {
+      console.warn('Stream error:', err?.message || err)
+      streamEnded = true
     }
   }
 
-  return fullText
+  // 启动流读取（不等待）
+  readStream()
+
+  // 轮询检查：流结束或超时（10秒无新数据）
+  const checkInterval = 500
+  const idleTimeout = 10000
+  const maxWait = 120000
+  const startTime = Date.now()
+
+  while (!streamEnded && Date.now() - startTime < maxWait) {
+    await new Promise(r => setTimeout(r, checkInterval))
+    // 如果超过10秒没有新数据且已有内容，认为结束
+    if (fullText.length > 0 && Date.now() - lastChunkTime > idleTimeout) {
+      console.warn('Stream idle timeout, returning content')
+      break
+    }
+  }
+
+  if (fullText.length > 0) {
+    return fullText
+  }
+  throw new Error('生成内容为空')
 }
 
 module.exports = {
