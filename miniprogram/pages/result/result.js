@@ -2,6 +2,8 @@
 const aiService = require('../../services/ai')
 const auth = require('../../services/auth')
 
+const FREE_PREVIEW_LENGTH = 200 // 免费预览字数
+
 Page({
     data: {
         recordId: '',
@@ -16,16 +18,15 @@ Page({
         },
         isPaid: false,
         generating: false,
-        loading: true
+        loading: true,
+        displayText: '' // 当前显示的文本
     },
 
     onLoad(options) {
         if (options.id) {
-            // 历史记录进入
             this.setData({ recordId: options.id })
             this.loadRecord(options.id)
         } else if (options.payload) {
-            // 录入页新生成进入
             try {
                 const payload = JSON.parse(decodeURIComponent(options.payload))
                 this.startGeneration(payload)
@@ -36,15 +37,18 @@ Page({
         }
     },
 
-    // 加载已有记录
     async loadRecord(id) {
         const db = wx.cloud.database()
         try {
             const res = await db.collection('records').doc(id).get()
             const data = res.data
+            const displayText = data.isPaid 
+                ? data.fullContent 
+                : (data.fullContent || '').substring(0, FREE_PREVIEW_LENGTH) + '...'
             this.setData({
                 record: data,
                 isPaid: data.isPaid,
+                displayText,
                 loading: false
             })
         } catch (err) {
@@ -54,11 +58,9 @@ Page({
         }
     },
 
-    // 开始新生成流程
     async startGeneration(payload) {
-        const { targetCareer, scoreDetail, personalInfo, partialEndIndex = 240 } = payload
+        const { targetCareer, scoreDetail, personalInfo } = payload
 
-        // 生成前确保登录
         try { await auth.ensureLogin() } catch { return }
 
         this.setData({
@@ -66,65 +68,56 @@ Page({
             loading: false,
             'record.targetCareer': targetCareer,
             'record.score': scoreDetail,
-            'record.price': 5.99,
-            'record.originalPrice': 19.9
+            displayText: ''
         })
 
-        let previewBuffer = ''
+        let fullText = ''
 
         try {
-            // 1. 流式调用
-            const fullText = await aiService.streamGenerateReport({
+            // 流式调用，实时显示前200字
+            await aiService.streamGenerateReport({
                 targetCareer,
                 scoreDetail,
                 personalInfo,
                 onText: (chunk) => {
-                    previewBuffer += chunk
-                    // 实时更新摘要，但限制长度不超过免费额度
-                    const showText = previewBuffer.length > partialEndIndex
-                        ? previewBuffer.substring(0, partialEndIndex) + '...'
-                        : previewBuffer
-
-                    this.setData({ 'record.summary': showText })
+                    fullText += chunk
+                    // 只显示前200字
+                    const preview = fullText.length > FREE_PREVIEW_LENGTH
+                        ? fullText.substring(0, FREE_PREVIEW_LENGTH) + '...'
+                        : fullText
+                    this.setData({ displayText: preview })
                 }
             })
 
-            // 2. 最终稳定内容生成（确保入库不乱码）
-            const final = await aiService.generateFinalReport({ targetCareer, scoreDetail, personalInfo })
-
-            // 3. 截断摘要，准备入库
-            const summary = final.summary || (final.fullContent || '').substring(0, partialEndIndex)
-
-            // 4. 更新页面数据
-            // fullContent 存完整版，summary 存截断版
-            // 界面根据 isPaid 切换显示
+            // 生成完成，更新数据
+            const summary = fullText.substring(0, FREE_PREVIEW_LENGTH)
             this.setData({
-                'record.fullContent': final.fullContent,
+                'record.fullContent': fullText,
                 'record.summary': summary,
-                'record.isPaid': false
+                'record.isPaid': false,
+                generating: false
             })
 
-            // 5. 写入数据库
+            // 写入数据库
             const saveRes = await wx.cloud.callFunction({
                 name: 'records_write',
                 data: {
                     targetCareer,
                     scoreDetail,
                     personalInfo,
-                    fullContent: final.fullContent,
+                    fullContent: fullText,
                     summary,
-                    partialEndIndex
+                    partialEndIndex: FREE_PREVIEW_LENGTH
                 }
             })
 
-            if (saveRes.result && saveRes.result.success) {
+            if (saveRes?.result?.success) {
                 this.setData({ recordId: saveRes.result.recordId })
             }
 
         } catch (err) {
             console.error('Generation failed', err)
             wx.showToast({ title: '生成失败，请重试', icon: 'none' })
-        } finally {
             this.setData({ generating: false })
         }
     },
@@ -184,9 +177,11 @@ Page({
             wx.hideLoading()
             if (res.result.success) {
                 wx.showToast({ title: '解锁成功', icon: 'success' })
+                const data = res.result.data
                 this.setData({
-                    record: res.result.data,
-                    isPaid: true
+                    record: data,
+                    isPaid: true,
+                    displayText: data.fullContent // 显示完整内容
                 })
             }
         } catch (err) {

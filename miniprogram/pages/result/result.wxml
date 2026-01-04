@@ -11,7 +11,7 @@
         </view>
         <!-- 生成时也展示部分预览内容 -->
         <scroll-view class="content-scroll generating-preview" scroll-y="true">
-            <text class="content-text">{{record.summary}}</text>
+            <text class="content-text">{{displayText}}</text>
         </scroll-view>
     </view>
     <!-- 结果展示卡片 -->
@@ -25,7 +25,7 @@
                 </view>
             </view>
             <scroll-view class="content-scroll" scroll-y="true">
-                <text class="content-text">{{isPaid ? record.fullContent : record.summary}}</text>
+                <text class="content-text">{{displayText}}</text>
                 <!-- 未付费时显示占位内容以撑开高度，确保模糊效果覆盖下方 -->
                 <block wx:if="{{!isPaid}}">
                     <view class="blur-placeholder">

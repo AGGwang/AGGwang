@@ -33,7 +33,7 @@ async function ensureLogin() {
         data: { type: 'login' }
       })
       const r = res.result
-      openid = r?.userInfo?._openid || r?.openid || ''
+      openid = (r && r.userInfo && r.userInfo._openid) || (r && r.openid) || ''
     }
 
     if (!openid) throw new Error('无法获取 openid')

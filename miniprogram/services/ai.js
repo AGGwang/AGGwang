@@ -1,15 +1,13 @@
 /**
- * 使用混元模型进行流式文本生成（官方示例接入方式）
- * 依赖：wx.cloud.extend.AI（前端环境）
+ * 使用混元模型进行流式文本生成
  * @param {Object} params
  * @param {string} params.targetCareer 目标职业
  * @param {string} params.scoreDetail 各科分数详情字符串
  * @param {string} params.personalInfo 个人情况简介
  * @param {(chunk:string)=>void} params.onText 接收增量文本的回调
- * @param {(event:any)=>void} [params.onEvent] 接收事件流的回调（可选）
- * @returns {Promise<string>} 生成的完整文本（JSON 字符串，包含 fullContent/summary）
+ * @returns {Promise<string>} 生成的完整文本
  */
-async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, onText, onEvent }) {
+async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, onText }) {
   const prompt = `
 你是一位资深的高考志愿填报与职业规划专家。
 请根据以下学生信息生成一份详细的职业规划报告。
@@ -20,9 +18,7 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, o
 - 个人情况：${personalInfo}
 
 【输出要求】
-请严格按照 JSON 格式返回，不要包含 markdown 代码块标记（如 \` \` \`json），包含以下两个字段：
-1. "fullContent": string 类型。一份完整的 Markdown 格式报告，包含"现状分析"（结合各科分数优劣势）、"选科推荐"（基于分数以及大学职业选科限制要求提出最优3门组合）、"详细学习路径"（分阶段）、"未来职业前景"。
-2. "summary": string 类型。一份报告摘要，Markdown 格式，简要包含现状和选科推荐，并在末尾提示"(更多详细学习路径及职业前景分析请解锁查看)"。
+请直接输出 Markdown 格式报告，包含：现状分析、选科推荐、详细学习路径、未来职业前景。
   `
 
   const model = wx.cloud.extend.AI.createModel('hunyuan-exp')
@@ -35,52 +31,13 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, o
   })
 
   let fullText = ''
-  let throttleTimer = null
-  let throttledBuffer = ''
 
-  const toString = (chunk) => {
-    if (typeof chunk === 'string') return chunk
-    if (chunk instanceof ArrayBuffer) return new TextDecoder('utf-8').decode(new Uint8Array(chunk))
-    if (chunk && chunk.buffer instanceof ArrayBuffer) return new TextDecoder('utf-8').decode(new Uint8Array(chunk.buffer))
-    try {
-      return String(chunk)
-    } catch {
-      return ''
+  // 使用 textStream 接收流式响应
+  for await (let str of res.textStream) {
+    fullText += str
+    if (typeof onText === 'function') {
+      onText(str)
     }
-  }
-
-  try {
-    for await (let str of res.textStream) {
-      console.log('Stream chunk:', str) // Debug log
-      const piece = toString(str)
-      fullText += piece
-      throttledBuffer += piece
-
-      if (typeof onText === 'function') {
-        // 使用更频繁的更新频率以提升流畅度
-        if (!throttleTimer) {
-          throttleTimer = setTimeout(() => {
-            onText(throttledBuffer)
-            throttledBuffer = ''
-            throttleTimer = null
-          }, 50)
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Stream processing error:', e)
-  }
-  if (throttleTimer && typeof onText === 'function' && throttledBuffer) {
-    onText(throttledBuffer)
-    clearTimeout(throttleTimer)
-  }
-
-  if (typeof onEvent === 'function') {
-    try {
-      for await (let event of res.eventStream) {
-        onEvent(event)
-      }
-    } catch { }
   }
 
   return fullText
@@ -88,13 +45,33 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, o
 
 module.exports = {
   streamGenerateReport,
+
+  /**
+   * 解析报告响应内容（用于处理 streamGenerateReport 返回的 fullText）
+   * @param {string} rawText 
+   * @returns {{fullContent:string, summary:string}}
+   */
+  parseReportResponse(rawText) {
+    if (!rawText) return { fullContent: '', summary: '' }
+
+    const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
+    try {
+      const parsed = JSON.parse(clean)
+      return {
+        fullContent: parsed.fullContent || rawText,
+        summary: parsed.summary || rawText.substring(0, 240)
+      }
+    } catch {
+      return {
+        fullContent: rawText,
+        summary: rawText.substring(0, 240)
+      }
+    }
+  },
+
   /**
    * 生成最终报告（非流式），用于写库，避免乱码
-   * @param {Object} params
-   * @param {string} params.targetCareer
-   * @param {string} params.scoreDetail
-   * @param {string} params.personalInfo
-   * @returns {Promise<{fullContent:string, summary:string}>}
+   * @deprecated 建议直接使用 streamGenerateReport 并配合 parseReportResponse 解析，以节省 Token
    */
   async generateFinalReport({ targetCareer, scoreDetail, personalInfo }) {
     const prompt = `
