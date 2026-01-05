@@ -19,9 +19,16 @@
         <view class="report-card">
             <view class="report-header">
                 <text class="career-title">{{record.targetCareer}} 职业规划</text>
-                <view class="score-box">
-                    <text class="score-label">当前分数:</text>
-                    <text class="score-val">{{record.score}}</text>
+                <view class="score-section">
+                    <text class="score-label">当前分数</text>
+                    <view class="score-grid">
+                        <block wx:for="{{record.scoreList}}" wx:key="name">
+                            <view class="score-item">
+                                <text class="score-subject">{{item.name}}</text>
+                                <text class="score-num">{{item.val}}</text>
+                            </view>
+                        </block>
+                    </view>
                 </view>
             </view>
             <scroll-view class="content-scroll" scroll-y="true">

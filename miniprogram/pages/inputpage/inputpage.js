@@ -72,6 +72,7 @@ Page({
             const payload = encodeURIComponent(JSON.stringify({
                 targetCareer,
                 scoreDetail: scoreStr,
+                scores,
                 personalInfo,
                 partialEndIndex: 240
             }))

@@ -3,6 +3,10 @@ const aiService = require('../../services/ai')
 const auth = require('../../services/auth')
 
 const FREE_PREVIEW_LENGTH = 200 // 免费预览字数
+const SUBJECT_MAP = {
+    physics: '物理', chemistry: '化学', biology: '生物',
+    politics: '政治', history: '历史', geography: '地理', technology: '技术'
+}
 
 Page({
     data: {
@@ -10,6 +14,7 @@ Page({
         record: {
             targetCareer: '',
             score: '',
+            scoreList: [],
             fullContent: '',
             summary: '',
             isPaid: false,
@@ -42,11 +47,23 @@ Page({
         try {
             const res = await db.collection('records').doc(id).get()
             const data = res.data
+
+            // 解析分数详情
+            let scoreList = []
+            if (data.scoreDetail) {
+                const parts = data.scoreDetail.split(',').map(s => s.trim())
+                scoreList = parts.map(p => {
+                    const [name, val] = p.split(':')
+                    if (name && val) return { name: name.trim(), val: parseInt(val) || 0 }
+                    return null
+                }).filter(Boolean)
+            }
+
             const displayText = data.isPaid
                 ? data.fullContent
                 : (data.fullContent || '').substring(0, FREE_PREVIEW_LENGTH) + '...'
             this.setData({
-                record: data,
+                record: { ...data, scoreList },
                 isPaid: data.isPaid,
                 displayText,
                 loading: false
@@ -59,15 +76,32 @@ Page({
     },
 
     async startGeneration(payload) {
-        const { targetCareer, scoreDetail, personalInfo } = payload
+        const { targetCareer, scoreDetail, scores, personalInfo } = payload
 
         try { await auth.ensureLogin() } catch { return }
+
+        // 处理分数列表
+        let scoreList = []
+        if (scores) {
+            scoreList = Object.keys(SUBJECT_MAP).map(key => ({
+                name: SUBJECT_MAP[key],
+                val: Number(scores[key]) || 0
+            })).filter(item => item.val > 0)
+        } else if (scoreDetail) {
+            const parts = scoreDetail.split(',').map(s => s.trim())
+            scoreList = parts.map(p => {
+                const [name, val] = p.split(':')
+                if (name && val) return { name: name.trim(), val: parseInt(val) || 0 }
+                return null
+            }).filter(Boolean)
+        }
 
         this.setData({
             generating: true,
             loading: false,
             'record.targetCareer': targetCareer,
             'record.score': scoreDetail,
+            'record.scoreList': scoreList,
             displayText: ''
         })
 
