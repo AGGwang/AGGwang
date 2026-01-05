@@ -78,6 +78,35 @@
     background: #fff;
 }
 
+/* 下拉选择器样式 */
+.picker-view {
+    height: 88rpx;
+    border: 2rpx solid #f0f0f0;
+    border-radius: 12rpx;
+    padding: 0 24rpx;
+    width: 100%;
+    box-sizing: border-box;
+    background: #fcfcfc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.picker-value {
+    font-size: 30rpx;
+    color: #333;
+}
+
+.picker-placeholder {
+    font-size: 30rpx;
+    color: #808080;
+}
+
+.picker-arrow {
+    font-size: 24rpx;
+    color: #999;
+}
+
 /* 分数网格布局 */
 .score-grid {
     display: grid;

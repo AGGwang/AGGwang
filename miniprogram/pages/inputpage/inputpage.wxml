@@ -9,6 +9,16 @@
     <input class="input" placeholder="例如：软件工程师、医生、律师" data-field="targetCareer" bindinput="onInput" />
   </view>
   <view class="form-group">
+    <view class="label">目标院校层次</view>
+    <picker bindchange="onCollegeLevelChange" value="{{collegeLevelIndex}}" range="{{collegeLevels}}">
+      <view class="picker-view">
+        <text wx:if="{{collegeLevel}}" class="picker-value">{{collegeLevel}}</text>
+        <text wx:else class="picker-placeholder">请选择目标院校层次</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+  <view class="form-group">
     <view class="label">各科分数 (7选3)</view>
     <view class="score-grid">
       <view class="score-item">

@@ -4,16 +4,18 @@
  * @param {string} params.targetCareer 目标职业
  * @param {string} params.scoreDetail 各科分数详情字符串
  * @param {string} params.personalInfo 个人情况简介
+ * @param {string} [params.collegeLevel] 目标院校层次
  * @param {(chunk:string)=>void} params.onText 接收增量文本的回调
  * @returns {Promise<string>} 生成的完整文本
  */
-async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, onText }) {
+async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, collegeLevel, onText }) {
   const prompt = `
 你是一位资深的高考志愿填报与职业规划专家。
 请根据以下学生信息生成一份详细的职业规划报告。
 
 【学生信息】
 - 目标职业：${targetCareer}
+- 目标院校层次：${collegeLevel || '未指定'}
 - 各科分数情况：${scoreDetail}
 - 个人情况：${personalInfo}
 

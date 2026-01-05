@@ -4,6 +4,9 @@ const auth = require('../../services/auth')
 Page({
     data: {
         targetCareer: '',
+        collegeLevels: ['985/211', '一本', '二本', '专科'],
+        collegeLevel: '',
+        collegeLevelIndex: -1,
         scores: {
             physics: '',
             chemistry: '',
@@ -23,9 +26,30 @@ Page({
         })
     },
 
+    /**
+     * 院校层次选择变更
+     */
+    onCollegeLevelChange(e) {
+        const index = e.detail.value
+        this.setData({
+            collegeLevelIndex: index,
+            collegeLevel: this.data.collegeLevels[index]
+        })
+    },
+
     onScoreInput(e) {
         const subject = e.currentTarget.dataset.subject
-        const value = e.detail.value
+        let value = e.detail.value
+
+        // 限制分数不超过100
+        if (value && parseInt(value) > 100) {
+            value = '100'
+            wx.showToast({
+                title: '分数不能超过100',
+                icon: 'none'
+            })
+        }
+
         this.setData({
             [`scores.${subject}`]: value
         })
@@ -35,7 +59,7 @@ Page({
      * 提交并触发前端流式生成
      */
     async submitForm() {
-        const { targetCareer, scores, personalInfo } = this.data
+        const { targetCareer, collegeLevel, scores, personalInfo } = this.data
 
         // 检查是否至少填了3门分数 (或者检查总分，这里简化为检查是否有输入)
         const filledScores = Object.values(scores).filter(s => s && s.trim() !== '')
@@ -47,9 +71,9 @@ Page({
             return
         }
 
-        if (!targetCareer || !personalInfo) {
+        if (!targetCareer || !collegeLevel || !personalInfo) {
             wx.showToast({
-                title: '请填写目标职业和个人简介',
+                title: '请完善所有信息',
                 icon: 'none'
             })
             return
@@ -57,6 +81,7 @@ Page({
 
         // 格式化分数信息字符串供AI使用
         const scoreStr = `
+      目标院校层次: ${collegeLevel}
       物理: ${scores.physics || 0}, 
       化学: ${scores.chemistry || 0}, 
       生物: ${scores.biology || 0}, 
@@ -71,6 +96,7 @@ Page({
             await auth.ensureLogin()
             const payload = encodeURIComponent(JSON.stringify({
                 targetCareer,
+                collegeLevel,
                 scoreDetail: scoreStr,
                 scores,
                 personalInfo,

@@ -76,7 +76,7 @@ Page({
     },
 
     async startGeneration(payload) {
-        const { targetCareer, scoreDetail, scores, personalInfo } = payload
+        const { targetCareer, scoreDetail, scores, personalInfo, collegeLevel } = payload
 
         try { await auth.ensureLogin() } catch { return }
 
@@ -113,6 +113,7 @@ Page({
                 targetCareer,
                 scoreDetail,
                 personalInfo,
+                collegeLevel, // 新增院校层次
                 onText: (chunk) => {
                     fullText += chunk
                     // 只显示前200字
@@ -139,6 +140,7 @@ Page({
                     targetCareer,
                     scoreDetail,
                     personalInfo,
+                    collegeLevel, // 保存院校层次
                     fullContent: fullText,
                     summary,
                     partialEndIndex: FREE_PREVIEW_LENGTH
@@ -228,5 +230,49 @@ Page({
     // 开发测试入口
     devUnlock() {
         this.onPaySuccess()
+    },
+
+    /**
+     * 联系专人规划
+     * 获取企业微信联系方式并跳转
+     */
+    async handleContactExpert() {
+        wx.showLoading({ title: '加载中...' })
+        try {
+            // 调用云函数获取企业微信链接/二维码
+            const res = await wx.cloud.callFunction({
+                name: 'get_contact_info', // 预留云函数名
+                data: { type: 'expert_consult' }
+            })
+            
+            wx.hideLoading()
+            
+            // 假设返回结构 { result: { url: 'https://work.weixin.qq.com/...' } }
+            // 目前仅打印日志或提示，待实装
+            console.log('Contact info:', res)
+            
+            if (res.result && res.result.url) {
+                // 如果是链接，尝试打开客服会话或WebView
+                wx.openCustomerServiceChat({
+                    extInfo: { url: res.result.url },
+                    corpId: 'YOUR_CORP_ID', // 企业ID
+                    success(res) {},
+                    fail(err) {
+                        // 降级处理：复制微信号或弹窗
+                        wx.setClipboardData({
+                            data: 'expert_wechat_id',
+                            success: () => wx.showToast({ title: '微信号已复制' })
+                        })
+                    }
+                })
+            } else {
+                wx.showToast({ title: '功能即将上线', icon: 'none' })
+            }
+        } catch (err) {
+            wx.hideLoading()
+            console.error('Contact expert failed', err)
+            // 这里的错误也可能是云函数未创建导致的，暂时提示敬请期待
+            wx.showToast({ title: '功能即将上线', icon: 'none' })
+        }
     }
 })

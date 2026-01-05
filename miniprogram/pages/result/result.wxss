@@ -218,6 +218,54 @@
     pointer-events: none;
 }
 
+/* 专人规划卡片 */
+.expert-card {
+    background: #fff;
+    border-radius: 24rpx;
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+    padding: 30rpx;
+    margin-top: 30rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.expert-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-right: 20rpx;
+}
+
+.expert-title {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8rpx;
+}
+
+.expert-desc {
+    font-size: 24rpx;
+    color: #999;
+}
+
+.expert-btn {
+    background: #e7f0ff !important;
+    color: #0052d9 !important;
+    font-size: 26rpx;
+    font-weight: bold;
+    border-radius: 40rpx;
+    padding: 0 32rpx;
+    height: 72rpx;
+    line-height: 72rpx;
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+.expert-btn:active {
+    opacity: 0.8;
+}
+
 /* 底部付费栏 */
 .pay-footer {
     position: fixed;

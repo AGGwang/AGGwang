@@ -50,6 +50,15 @@
             <!-- 模糊遮罩 (置于 scroll-view 外部或作为覆盖层) -->
             <view class="gauss-mask" wx:if="{{!isPaid}}"></view>
         </view>
+        
+        <!-- 专人规划引导卡片 (仅在已付费且非生成状态显示) -->
+        <view class="expert-card" wx:if="{{isPaid}}">
+            <view class="expert-info">
+                <text class="expert-title">需要更详细的个性化指导？</text>
+                <text class="expert-desc">预约资深规划师，一对一为您定制升学路径</text>
+            </view>
+            <button class="expert-btn" bindtap="handleContactExpert">联系专人规划</button>
+        </view>
     </block>
     <!-- 底部付费栏 (始终固定) -->
     <view class="pay-footer" wx:if="{{!isPaid && !generating}}">
