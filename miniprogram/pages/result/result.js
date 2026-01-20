@@ -1,6 +1,7 @@
 // pages/result/result.js
 const aiService = require('../../services/ai')
 const auth = require('../../services/auth')
+const payment = require('../../services/payment')
 
 const FREE_PREVIEW_LENGTH = 200 // 免费预览字数
 const SUBJECT_MAP = {
@@ -158,50 +159,43 @@ Page({
         }
     },
 
-    // 支付处理
+    // 支付处理（使用新的支付服务）
     async handlePay() {
-        if (!this.data.recordId) return
+        if (!this.data.recordId) {
+            wx.showToast({ title: '记录ID不存在', icon: 'none' })
+            return
+        }
 
-        wx.showLoading({ title: '请求支付...' })
         try {
-            const res = await wx.cloud.callFunction({
-                name: 'pay_service',
-                data: { recordId: this.data.recordId }
-            })
+            // 使用封装的支付服务
+            const result = await payment.payAndWaitResult(this.data.recordId)
 
-            const result = res.result
-            if (!result.success) throw new Error(result.errMsg || '支付请求失败')
-
-            // 模拟支付逻辑
-            if (result.mock) {
-                wx.hideLoading()
+            if (result.success) {
+                // 支付成功，刷新页面数据
+                wx.showToast({ title: result.message || '支付成功', icon: 'success' })
+                await this.loadRecord(this.data.recordId)
+            } else if (result.cancelled) {
+                // 用户取消支付
+                wx.showToast({ title: '已取消支付', icon: 'none' })
+            } else {
+                // 支付失败
                 wx.showModal({
-                    title: '支付模拟',
-                    content: '点击确定模拟支付成功',
-                    success: (res) => {
-                        if (res.confirm) this.onPaySuccess()
-                    }
+                    title: '支付失败',
+                    content: result.errMsg || '支付过程中出现问题，请重试',
+                    showCancel: false
                 })
-                return
             }
-
-            // 真实支付调起
-            wx.requestPayment({
-                ...result.payment,
-                success: () => this.onPaySuccess(),
-                fail: (err) => {
-                    console.error('Pay fail', err)
-                    wx.hideLoading()
-                }
-            })
         } catch (err) {
-            wx.hideLoading()
-            console.error(err)
-            wx.showToast({ title: '支付失败', icon: 'none' })
+            console.error('[支付] 异常:', err)
+            wx.showModal({
+                title: '支付异常',
+                content: '支付过程中出现异常，请稍后重试',
+                showCancel: false
+            })
         }
     },
 
-    // 支付成功回调
+    // 支付成功回调（保留用于兼容性）
     async onPaySuccess() {
         wx.showLoading({ title: '解锁中...' })
         try {
