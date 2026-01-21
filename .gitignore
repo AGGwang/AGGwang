@@ -1,8 +1,5 @@
 node_modules
 
-# 支付配置文件（包含敏感信息）
-cloudfunctions/pay_service/config.js
-
 # 日志文件
 error_logs/
 *.log
@@ -17,3 +14,8 @@ Thumbs.db
 
 # 微信开发者工具
 project.private.config.json
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
