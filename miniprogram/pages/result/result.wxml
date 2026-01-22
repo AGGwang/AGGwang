@@ -5,6 +5,7 @@
         <view class="gen-header">
             <text class="gen-title">AI 正在生成 {{record.targetCareer}} 职业规划</text>
             <text class="gen-subtitle">实时输出 (仅展示部分内容，更多需解锁)</text>
+            <text class="gen-tip">（生成速度较慢请耐心等待不要退出）</text>
         </view>
         <view class="progress-bar">
             <view class="progress-inner"></view>
@@ -50,7 +51,6 @@
             <!-- 模糊遮罩 (置于 scroll-view 外部或作为覆盖层) -->
             <view class="gauss-mask" wx:if="{{!isPaid}}"></view>
         </view>
-        
         <!-- 专人规划引导卡片 (仅在已付费且非生成状态显示) -->
         <view class="expert-card" wx:if="{{isPaid}}">
             <view class="expert-info">
@@ -63,13 +63,12 @@
     <!-- 底部付费栏 (始终固定) -->
     <view class="pay-footer" wx:if="{{!isPaid && !generating}}">
         <view class="pay-info">
-            <text class="pay-tip">已为你实时展示部分内容，解锁查看完整 3000字+ 深度规划报告</text>
+            <text class="pay-tip">已为您实时展示部分内容，解锁查看完整 3000字+ 深度规划报告</text>
             <view class="price-box">
                 <text class="original-price">¥{{record.originalPrice}}</text>
                 <text class="current-price">¥{{record.price}}</text>
             </view>
         </view>
         <button class="unlock-btn" bindtap="handlePay">立即解锁</button>
-        <button class="dev-btn" bindtap="devUnlock">[开发测试] 模拟支付成功</button>
     </view>
 </view>

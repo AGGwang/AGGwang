@@ -1,5 +1,17 @@
 /**
- * 使用混元模型进行流式文本生成
+ * AI服务模块 - 使用腾讯云开发Agent
+ * 
+ * Agent ID: ibot-7xuan3xiaoc-nhtshc
+ * 提示词已在云开发平台配置好，只需传入用户信息即可
+ */
+
+// Agent配置
+const AGENT_CONFIG = {
+  botId: 'ibot-7xuan3xiaoc-nhtshc'
+}
+
+/**
+ * 使用Agent进行流式文本生成
  * @param {Object} params
  * @param {string} params.targetCareer 目标职业
  * @param {string} params.scoreDetail 各科分数详情字符串
@@ -9,27 +21,23 @@
  * @returns {Promise<string>} 生成的完整文本
  */
 async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, collegeLevel, onText }) {
-  const prompt = `
-你是一位资深的高考志愿填报与职业规划专家。
-请根据以下学生信息生成一份详细的职业规划报告。
-
+  // 构建用户输入信息（Agent已配置好提示词，只需传入用户数据）
+  const userMessage = `
 【学生信息】
 - 目标职业：${targetCareer}
 - 目标院校层次：${collegeLevel || '未指定'}
 - 各科分数情况：${scoreDetail}
 - 个人情况：${personalInfo}
+  `.trim()
 
-【输出要求】
-请直接输出 Markdown 格式报告，包含：现状分析、选科推荐、详细学习路径、未来职业前景。
-  `
+  console.log('[AI] 调用Agent生成报告', { botId: AGENT_CONFIG.botId })
 
-  const model = wx.cloud.extend.AI.createModel('hunyuan-exp')
-  const res = await model.streamText({
+  // 调用Agent
+  const res = await wx.cloud.extend.AI.bot.sendMessage({
     data: {
-      model: 'hunyuan-t1-latest',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-    },
+      botId: AGENT_CONFIG.botId,
+      msg: userMessage
+    }
   })
 
   let fullText = ''
@@ -48,7 +56,7 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, c
       }
       streamEnded = true
     } catch (err) {
-      console.warn('Stream error:', err?.message || err)
+      console.warn('[AI] Stream error:', err?.message || err)
       streamEnded = true
     }
   }
@@ -66,22 +74,107 @@ async function streamGenerateReport({ targetCareer, scoreDetail, personalInfo, c
     await new Promise(r => setTimeout(r, checkInterval))
     // 如果超过10秒没有新数据且已有内容，认为结束
     if (fullText.length > 0 && Date.now() - lastChunkTime > idleTimeout) {
-      console.warn('Stream idle timeout, returning content')
+      console.warn('[AI] Stream idle timeout, returning content')
       break
     }
   }
 
   if (fullText.length > 0) {
+    console.log('[AI] 生成完成，内容长度:', fullText.length)
     return fullText
   }
   throw new Error('生成内容为空')
 }
 
+/**
+ * 使用Agent进行非流式文本生成
+ * @param {Object} params
+ * @param {string} params.targetCareer 目标职业
+ * @param {string} params.scoreDetail 各科分数详情字符串
+ * @param {string} params.personalInfo 个人情况简介
+ * @param {string} [params.collegeLevel] 目标院校层次
+ * @returns {Promise<string>} 生成的完整文本
+ */
+async function generateReport({ targetCareer, scoreDetail, personalInfo, collegeLevel }) {
+  // 构建用户输入信息
+  const userMessage = `
+【学生信息】
+- 目标职业：${targetCareer}
+- 目标院校层次：${collegeLevel || '未指定'}
+- 各科分数情况：${scoreDetail}
+- 个人情况：${personalInfo}
+  `.trim()
+
+  console.log('[AI] 调用Agent生成报告（非流式）', { botId: AGENT_CONFIG.botId })
+
+  // 调用Agent
+  const res = await wx.cloud.extend.AI.bot.sendMessage({
+    data: {
+      botId: AGENT_CONFIG.botId,
+      msg: userMessage
+    }
+  })
+
+  // 收集完整响应
+  let fullText = ''
+  for await (let str of res.textStream) {
+    fullText += str
+  }
+
+  if (fullText.length > 0) {
+    console.log('[AI] 生成完成，内容长度:', fullText.length)
+    return fullText
+  }
+  throw new Error('生成内容为空')
+}
+
+/**
+ * 获取Agent聊天记录
+ * @param {number} pageNumber 页码
+ * @param {number} pageSize 每页数量
+ * @returns {Promise<Array>} 聊天记录列表
+ */
+async function getChatRecords(pageNumber = 1, pageSize = 10) {
+  try {
+    const records = await wx.cloud.extend.AI.bot.getChatRecords({
+      botId: AGENT_CONFIG.botId,
+      pageNumber,
+      pageSize,
+      sort: 'desc'
+    })
+    return records
+  } catch (err) {
+    console.error('[AI] 获取聊天记录失败:', err)
+    return []
+  }
+}
+
+/**
+ * 获取Agent列表
+ * @returns {Promise<Array>} Agent列表
+ */
+async function getAgentList() {
+  try {
+    const list = await wx.cloud.extend.AI.bot.list({
+      pageNumber: 1,
+      pageSize: 10
+    })
+    console.log('[AI] Agent列表:', list)
+    return list
+  } catch (err) {
+    console.error('[AI] 获取Agent列表失败:', err)
+    return []
+  }
+}
+
 module.exports = {
   streamGenerateReport,
+  generateReport,
+  getChatRecords,
+  getAgentList,
 
   /**
-   * 解析报告响应内容（用于处理 streamGenerateReport 返回的 fullText）
+   * 解析报告响应内容
    * @param {string} rawText 
    * @returns {{fullContent:string, summary:string}}
    */
@@ -104,46 +197,17 @@ module.exports = {
   },
 
   /**
-   * 生成最终报告（非流式），用于写库，避免乱码
-   * @deprecated 建议直接使用 streamGenerateReport 并配合 parseReportResponse 解析，以节省 Token
+   * 获取当前Agent配置
    */
-  async generateFinalReport({ targetCareer, scoreDetail, personalInfo }) {
-    const prompt = `
-你是一位资深的高考志愿填报与职业规划专家。
-请根据以下学生信息生成一份详细的职业规划报告。
+  getAgentConfig() {
+    return { ...AGENT_CONFIG }
+  },
 
-【学生信息】
-- 目标职业：${targetCareer}
-- 各科分数情况：${scoreDetail}
-- 个人情况：${personalInfo}
-
-【输出要求】
-请严格按照 JSON 格式返回，不要包含 markdown 代码块标记（如 \` \` \`json），包含以下两个字段：
-1. "fullContent": string 类型。一份完整的 Markdown 格式报告，包含"现状分析"（结合各科分数优劣势）、"选科推荐"（基于分数以及大学职业选科限制要求提出最优3门组合）、"详细学习路径"（分阶段）、"未来职业前景"。
-2. "summary": string 类型。一份报告摘要，Markdown 格式，简要包含现状和选科推荐，并在末尾提示"(更多详细学习路径及职业前景分析请解锁查看)"。
-    `
-    const model = wx.cloud.extend.AI.createModel('hunyuan-exp')
-    const res = await model.generateText({
-      data: {
-        model: 'hunyuan-t1-latest',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-      },
-    })
-    let content = ''
-    if (typeof res === 'string') {
-      content = res
-    } else if (res && res.choices && res.choices[0] && res.choices[0].message) {
-      content = res.choices[0].message.content || ''
-    } else {
-      content = JSON.stringify(res || {})
-    }
-    const clean = content.replace(/```json/g, '').replace(/```/g, '').trim()
-    try {
-      const parsed = JSON.parse(clean)
-      return { fullContent: parsed.fullContent, summary: parsed.summary }
-    } catch {
-      return { fullContent: clean, summary: clean.substring(0, 240) }
-    }
+  /**
+   * 设置Agent ID（用于切换不同Agent）
+   * @param {string} botId 
+   */
+  setAgentId(botId) {
+    AGENT_CONFIG.botId = botId
   }
 }

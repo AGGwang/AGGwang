@@ -10,7 +10,7 @@ const db = cloud.database()
  */
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const { targetCareer, scoreDetail, personalInfo, fullContent, summary, partialEndIndex = 240 } = event
+  const { targetCareer, scoreDetail, personalInfo, collegeLevel, fullContent, summary, partialEndIndex = 240 } = event
 
   try {
     const record = {
@@ -18,6 +18,7 @@ exports.main = async (event, context) => {
       targetCareer,
       scoreDetail,
       personalInfo,
+      collegeLevel: collegeLevel || '', // 保存院校层次
       fullContent,
       summary,
       partialEndIndex,

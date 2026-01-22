@@ -51,13 +51,19 @@ Page({
 
             // 解析分数详情
             let scoreList = []
+            // 优先展示院校层次
+            if (data.collegeLevel) {
+                scoreList.push({ name: '目标院校层次', val: data.collegeLevel })
+            }
             if (data.scoreDetail) {
                 const parts = data.scoreDetail.split(',').map(s => s.trim())
-                scoreList = parts.map(p => {
+                scoreList = scoreList.concat(parts.map(p => {
                     const [name, val] = p.split(':')
+                    // 过滤掉已经在头部展示的院校层次
+                    if (name && name.includes('院校层次')) return null
                     if (name && val) return { name: name.trim(), val: parseInt(val) || 0 }
                     return null
-                }).filter(Boolean)
+                }).filter(Boolean))
             }
 
             const displayText = data.isPaid
@@ -83,18 +89,24 @@ Page({
 
         // 处理分数列表
         let scoreList = []
+        // 优先展示院校层次
+        if (collegeLevel) {
+            scoreList.push({ name: '目标院校层次', val: collegeLevel })
+        }
         if (scores) {
-            scoreList = Object.keys(SUBJECT_MAP).map(key => ({
+            scoreList = scoreList.concat(Object.keys(SUBJECT_MAP).map(key => ({
                 name: SUBJECT_MAP[key],
                 val: Number(scores[key]) || 0
-            })).filter(item => item.val > 0)
+            })).filter(item => item.val > 0))
         } else if (scoreDetail) {
             const parts = scoreDetail.split(',').map(s => s.trim())
-            scoreList = parts.map(p => {
+            scoreList = scoreList.concat(parts.map(p => {
                 const [name, val] = p.split(':')
+                // 过滤掉可能存在的院校层次
+                if (name && name.includes('院校层次')) return null
                 if (name && val) return { name: name.trim(), val: parseInt(val) || 0 }
                 return null
-            }).filter(Boolean)
+            }).filter(Boolean))
         }
 
         this.setData({
@@ -135,6 +147,7 @@ Page({
             })
 
             // 写入数据库
+            console.log('Start saving record...')
             const saveRes = await wx.cloud.callFunction({
                 name: 'records_write',
                 data: {
@@ -147,9 +160,13 @@ Page({
                     partialEndIndex: FREE_PREVIEW_LENGTH
                 }
             })
+            console.log('Save record response:', saveRes)
 
             if (saveRes?.result?.success) {
                 this.setData({ recordId: saveRes.result.recordId })
+            } else {
+                console.error('Save record failed:', saveRes)
+                wx.showToast({ title: '保存记录失败', icon: 'none' })
             }
 
         } catch (err) {
@@ -221,11 +238,6 @@ Page({
         }
     },
 
-    // 开发测试入口
-    devUnlock() {
-        this.onPaySuccess()
-    },
-
     /**
      * 联系专人规划
      * 获取企业微信联系方式并跳转
@@ -238,19 +250,19 @@ Page({
                 name: 'get_contact_info', // 预留云函数名
                 data: { type: 'expert_consult' }
             })
-            
+
             wx.hideLoading()
-            
+
             // 假设返回结构 { result: { url: 'https://work.weixin.qq.com/...' } }
             // 目前仅打印日志或提示，待实装
             console.log('Contact info:', res)
-            
+
             if (res.result && res.result.url) {
                 // 如果是链接，尝试打开客服会话或WebView
                 wx.openCustomerServiceChat({
                     extInfo: { url: res.result.url },
                     corpId: 'YOUR_CORP_ID', // 企业ID
-                    success(res) {},
+                    success(res) { },
                     fail(err) {
                         // 降级处理：复制微信号或弹窗
                         wx.setClipboardData({

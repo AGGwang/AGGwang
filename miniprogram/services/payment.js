@@ -15,10 +15,7 @@ const PAY_CONFIG = {
   // 报告解锁价格（单位：分，100 = 1元）
   reportPrice: 100,
   // 商品描述
-  description: '7选3测评报告解锁',
-  // 是否启用模拟支付（开发测试用）
-  // 已完成官方配置，启用真实支付
-  enableMockPay: false
+  description: '7选3测评报告解锁'
 }
 
 /**
@@ -42,16 +39,6 @@ function generateOutTradeNo(recordId) {
  */
 export async function requestPayment(recordId) {
   try {
-    // 如果启用模拟支付，直接返回模拟结果
-    if (PAY_CONFIG.enableMockPay) {
-      console.log('[支付] 模拟支付模式')
-      return {
-        success: true,
-        mock: true,
-        message: '当前为开发模式，使用模拟支付'
-      }
-    }
-
     // 生成商户订单号
     const outTradeNo = generateOutTradeNo(recordId)
 
@@ -99,10 +86,13 @@ export async function requestPayment(recordId) {
     }
 
     // 获取支付参数
-    const paymentData = res.result.data
-    
-    if (!paymentData) {
-      throw new Error('未获取到支付参数')
+    // 兼容不同的返回结构，有些模板可能将参数放在 payment 字段下
+    const paymentData = res.result.data || res.result.payment || res.result
+
+    // 检查关键参数：package 或 packageVal
+    if (!paymentData || (!paymentData.package && !paymentData.packageVal)) {
+      console.error('[支付] 参数异常，完整返回:', JSON.stringify(res))
+      throw new Error('支付参数缺失(package/packageVal)')
     }
 
     console.log('[支付] 支付参数:', JSON.stringify(paymentData))
@@ -111,7 +101,8 @@ export async function requestPayment(recordId) {
     await wx.requestPayment({
       timeStamp: paymentData.timeStamp,
       nonceStr: paymentData.nonceStr,
-      package: paymentData.package,
+      // 兼容 packageVal 和 package 字段
+      package: paymentData.package || paymentData.packageVal,
       signType: paymentData.signType || 'RSA',
       paySign: paymentData.paySign
     })
@@ -276,39 +267,6 @@ export async function payAndWaitResult(recordId) {
     return payResult
   }
 
-  // 如果是模拟支付，直接解锁报告
-  if (payResult.mock) {
-    wx.showLoading({ title: '解锁中...' })
-    
-    try {
-      const unlockRes = await wx.cloud.callFunction({
-        name: 'unlock_record',
-        data: { recordId }
-      })
-
-      wx.hideLoading()
-
-      if (unlockRes.result.success) {
-        return {
-          success: true,
-          mock: true,
-          message: '模拟支付成功，报告已解锁'
-        }
-      } else {
-        return {
-          success: false,
-          errMsg: '解锁报告失败'
-        }
-      }
-    } catch (err) {
-      wx.hideLoading()
-      return {
-        success: false,
-        errMsg: '解锁报告失败'
-      }
-    }
-  }
-
   // 真实支付成功，解锁报告
   wx.showLoading({ title: '正在解锁报告...' })
 
@@ -346,14 +304,6 @@ export async function payAndWaitResult(recordId) {
  */
 export function getPayConfig() {
   return { ...PAY_CONFIG }
-}
-
-/**
- * 设置是否启用模拟支付
- * @param {boolean} enable 
- */
-export function setMockPayEnabled(enable) {
-  PAY_CONFIG.enableMockPay = enable
 }
 
 /**
