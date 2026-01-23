@@ -1,0 +1,136 @@
+/* pages/order/order.wxss */
+.container {
+  padding: 30rpx;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: block; /* 覆盖 app.wxss */
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.order-item {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.order-item:active {
+  transform: scale(0.98);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.order-no {
+  font-size: 24rpx;
+  color: #999;
+  font-family: monospace;
+}
+
+.order-status {
+  font-size: 24rpx;
+  color: #07c160;
+  font-weight: 500;
+  background: #e6ffed;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.order-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.product-desc {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.price-box {
+  display: flex;
+  align-items: baseline;
+}
+
+.currency {
+  font-size: 24rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.amount {
+  font-size: 36rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  color: #0052d9;
+  border: 1rpx solid #0052d9;
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+  background: transparent;
+  line-height: normal;
+}
+
+.empty-tip {
+  padding: 100rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.3;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 26rpx;
+}

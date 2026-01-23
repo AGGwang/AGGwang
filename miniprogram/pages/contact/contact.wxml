@@ -1,0 +1,38 @@
+<!--pages/contact/contact.wxml-->
+<view class="container">
+  <view class="contact-card">
+    <view class="contact-header">
+      <text class="title">联系与反馈</text>
+      <text class="subtitle">我们在意您的每一个声音</text>
+    </view>
+    
+    <view class="action-list">
+      <!-- 联系客服按钮 -->
+      <button class="action-item" open-type="contact">
+        <view class="content">
+          <text class="label">在线客服</text>
+          <text class="desc">工作日 9:00-18:00 在线服务</text>
+        </view>
+        <view class="arrow">></view>
+      </button>
+      
+      <!-- 意见反馈按钮 -->
+      <button class="action-item" open-type="feedback">
+        <view class="content">
+          <text class="label">意见反馈 / 问题上报</text>
+          <text class="desc">帮助我们做得更好</text>
+        </view>
+        <view class="arrow">></view>
+      </button>
+
+      <!-- 邮箱咨询 -->
+      <view class="action-item" bindtap="copyEmail">
+        <view class="content">
+          <text class="label">商务咨询</text>
+          <text class="desc">点击复制邮箱：paul7in3wechat@outlook.com</text>
+        </view>
+        <view class="arrow">></view>
+      </view>
+    </view>
+  </view>
+</view>

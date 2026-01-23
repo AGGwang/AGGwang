@@ -193,5 +193,17 @@ Page({
         wx.navigateTo({
             url: `/pages/result/result?id=${id}`
         })
+    },
+
+    goToContact() {
+        wx.navigateTo({
+            url: '/pages/contact/contact'
+        })
+    },
+
+    goToOrder() {
+        wx.navigateTo({
+            url: '/pages/order/order'
+        })
     }
 })

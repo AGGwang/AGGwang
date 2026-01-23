@@ -4,6 +4,8 @@
     "pages/inputpage/inputpage",
     "pages/result/result",
     "pages/mine/mine",
+    "pages/contact/contact",
+    "pages/order/order",
     "pages/logs/logs"
   ],
   "window": {

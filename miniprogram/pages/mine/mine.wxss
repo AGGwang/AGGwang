@@ -193,6 +193,44 @@
     font-weight: normal;
 }
 
+/* 菜单列表样式 */
+.menu-list {
+    background: #fff;
+    border-radius: 24rpx;
+    padding: 0 30rpx;
+    margin-bottom: 50rpx;
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32rpx 0;
+    width: 100%;
+}
+
+.menu-item:active {
+    opacity: 0.7;
+}
+
+.menu-left {
+    display: flex;
+    align-items: center;
+}
+
+.menu-text {
+    font-size: 30rpx;
+    color: #333;
+    font-weight: 500;
+}
+
+.divider-line {
+    height: 1rpx;
+    background-color: #f0f0f0;
+    width: 100%;
+}
+
 .section-title {
     font-size: 34rpx;
     font-weight: bold;
