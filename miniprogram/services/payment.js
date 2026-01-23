@@ -77,11 +77,13 @@ export async function requestPayment(recordId) {
 
     // 检查返回结果
     if (!res.result) {
+      console.error('[支付] 云函数返回为空:', res)
       throw new Error('云函数返回结果为空')
     }
 
     // 官方模板返回格式：{ errCode: 0, errMsg: 'ok', data: {...} }
     if (res.result.errCode !== 0 && res.result.code !== 0) {
+      console.error('[支付] 云函数返回错误:', res.result)
       throw new Error(res.result.errMsg || res.result.msg || '创建订单失败')
     }
 
