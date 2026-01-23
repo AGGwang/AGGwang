@@ -13,7 +13,7 @@
 // 支付配置
 const PAY_CONFIG = {
   // 报告解锁价格（单位：分，100 = 1元）
-  reportPrice: 100,
+  reportPrice: 599,
   // 商品描述
   description: '7选3测评报告解锁'
 }
