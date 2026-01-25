@@ -1,0 +1,97 @@
+[Deprecation] SharedArrayBuffer will require cross-origin isolation as of M92, around July 2021. See https://developer.chrome.com/blog/enabling-shared-array-buffer/ for more details.
+[system] WeChatLib: 3.13.0 (2025.12.25 16:42:13)
+[system] Subpackages: N/A
+[system] LazyCodeLoading: true
+[Perf] 全局自定义组件可能影响按需注入的效果，请谨慎使用（在 app.json 中检测到 1 个）。
+参考 https://developers.weixin.qq.com/miniprogram/dev/framework/ability/lazyload.html
+Lazy code loading is enabled. Only injecting required components.
+Sat Jan 24 2026 13:23:14 GMT+0800 (香港标准时间) 文章推荐
+getSystemInfo API 提示
+小程序基础库从 3.7.0 起正式支持 HarmonyOS 平台，开发者可通过 wx.getDeviceInfo() 判断平台进行兼容处理，让小程序在 HarmonyOS 也获得最佳体验，查看指引[https://developers.weixin.qq.com/community/develop/doc/00008e041106f0259bb33530164409]
+关于上述警告，点击查看更多信息：https://developers.weixin.qq.com/community/develop/doc/00008e041106f0259bb33530164409]
+[Perf] App.onLaunch took 105ms
+(anonymous) @ app.ts:2
+async function (async)
+(anonymous) @ appservice.app.js:5
+[渲染层网络层错误] Failed to load font https://tdesign.gtimg.com/icon/0.4.0/fonts/t.woff
+net::ERR_CACHE_MISS 
+(env: Windows,mp,1.06.2412050; lib: 3.13.0)
+[system] Launch Time: 2569 ms
+app.ts:13 0c3NTSkl26Nd4h43zSml2PV8X14NTSk8
+[自动热重载] 已开启代码文件保存后自动热重载
+[Deprecation] SharedArrayBuffer will require cross-origin isolation as of M92, around July 2021. See https://developer.chrome.com/blog/enabling-shared-array-buffer/ for more details.
+[自动热重载] 已开启代码文件保存后自动热重载
+ai.js:36 [AI] 调用Agent生成报告 {botId: "ibot-7in3main-4gz5m4vl6bc217a0"}
+VM749:1 POST https://hischool7in3-6g95n1i3f4479bdc.api.tcloudbasegateway.com/v1/aibot/bots/ibot-7in3main-4gz5m4vl6bc217a0/send-message 404 (Not Found)(env: Windows,mp,1.06.2412050; lib: 3.13.0)
+request @ VM749:1
+stream @ VM749:1
+async function (async)
+stream @ VM749:1
+sendMessage @ VM749:1
+_callee2$ @ ai.js:39
+s @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+c @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+_streamGenerateReport @ ai.js:90
+streamGenerateReport @ ai.js:24
+_callee2$ @ result.js? [sm]:125
+s @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+c @ asyncToGenerator.js?forceSync=true:1
+Promise.then (async)
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+c @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+startGeneration @ result.js? [sm]:175
+onLoad @ result.js? [sm]:38
+result.js? [sm]:173 Generation failed Error: 生成内容为空
+    at _callee2$ (ai.js:89)
+    at s (regeneratorRuntime.js?forceSync=true:1)
+    at Generator.<anonymous> (regeneratorRuntime.js?forceSync=true:1)
+    at Generator.next (regeneratorRuntime.js?forceSync=true:1)
+    at asyncGeneratorStep (asyncToGenerator.js?forceSync=true:1)
+    at c (asyncToGenerator.js?forceSync=true:1)(env: Windows,mp,1.06.2412050; lib: 3.13.0)
+_callee2$ @ result.js? [sm]:173
+s @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+(anonymous) @ regeneratorRuntime.js?forceSync=true:1
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+i @ asyncToGenerator.js?forceSync=true:1
+Promise.then (async)
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+c @ asyncToGenerator.js?forceSync=true:1
+Promise.then (async)
+asyncGeneratorStep @ asyncToGenerator.js?forceSync=true:1
+c @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+(anonymous) @ asyncToGenerator.js?forceSync=true:1
+startGeneration @ result.js? [sm]:175
+onLoad @ result.js? [sm]:38
+[worker] reportRealtimeAction:fail not support
+$ @ WAWorker.js:1
+invoke @ WAWorker.js:1
+invoke @ WAWorker.js:1
+G @ WAWorker.js:1
+(anonymous) @ WAWorker.js:1
+qe @ WAWorker.js:1
+Q @ WAWorker.js:1
+f @ WAWorker.js:1
+(anonymous) @ WAWorker.js:1
+(anonymous) @ WAWorker.js:1
+setTimeout (async)
+globalThis.setTimeout @ WAWorker.js:1
+Y @ WAWorker.js:1
+De @ WAWorker.js:1
+(anonymous) @ WAWorker.js:1
+r @ WAWorker.js:1
+s @ WAWorker.js:1
+callAndRemove @ WAWorker.js:1
+invokeCallbackHandler @ WAWorker.js:1
+eval @ VM11:1
