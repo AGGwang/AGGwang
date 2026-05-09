@@ -1,115 +1,161 @@
-// pages/inputpage/inputpage.js
-const aiService = require('../../services/ai')
 const auth = require('../../services/auth')
+
+const DEFAULT_SUBJECTS = [
+  { key: 'physics', name: '物理', selected: true },
+  { key: 'chemistry', name: '化学', selected: true },
+  { key: 'biology', name: '生物', selected: false },
+  { key: 'politics', name: '政治', selected: false },
+  { key: 'history', name: '历史', selected: true },
+  { key: 'geography', name: '地理', selected: false },
+  { key: 'technology', name: '技术', selected: false }
+]
+
 Page({
-    data: {
-        targetCareer: '',
-        collegeLevels: ['985/211', '一本', '二本', '专科'],
-        collegeLevel: '',
-        collegeLevelIndex: -1,
-        scores: {
-            physics: '',
-            chemistry: '',
-            biology: '',
-            politics: '',
-            history: '',
-            geography: '',
-            technology: ''
-        },
-        personalInfo: ''
-    },
+  data: {
+    province: '',
+    totalScore: '',
+    rank: '',
+    scoreLevels: ['985/211附近', '重点线附近', '本科线附近', '专科层次', '不确定'],
+    scoreLevel: '',
+    scoreLevelIndex: -1,
+    subjects: DEFAULT_SUBJECTS,
+    selectedSubjectText: DEFAULT_SUBJECTS.filter(item => item.selected).map(item => item.name).join(' + '),
+    mbti: '',
+    interest: '',
+    careerPlans: [
+      {
+        value: '本科就业',
+        label: '本科就业',
+        desc: '希望大学阶段尽早积累实习和作品，毕业后直接工作'
+      },
+      {
+        value: '考研深造',
+        label: '考研深造',
+        desc: '接受长期学习投入，希望通过研究生阶段提升学校或专业层次'
+      },
+      {
+        value: '考公考编',
+        label: '考公考编',
+        desc: '更重视稳定性，专业选择需兼顾岗位限制和竞争强度'
+      },
+      {
+        value: '出国留学',
+        label: '出国留学',
+        desc: '考虑海外升学或就业，需关注专业国际认可度与成本'
+      }
+    ],
+    careerPlan: '本科就业',
+    personalInfo: ''
+  },
 
-    onInput(e) {
-        const field = e.currentTarget.dataset.field
-        this.setData({
-            [field]: e.detail.value
-        })
-    },
-
-    /**
-     * 院校层次选择变更
-     */
-    onCollegeLevelChange(e) {
-        const index = e.detail.value
-        this.setData({
-            collegeLevelIndex: index,
-            collegeLevel: this.data.collegeLevels[index]
-        })
-    },
-
-    onScoreInput(e) {
-        const subject = e.currentTarget.dataset.subject
-        let value = e.detail.value
-
-        // 限制分数不超过100
-        if (value && parseInt(value) > 100) {
-            value = '100'
-            wx.showToast({
-                title: '分数不能超过100',
-                icon: 'none'
-            })
-        }
-
-        this.setData({
-            [`scores.${subject}`]: value
-        })
-    },
-
-    /**
-     * 提交并触发前端流式生成
-     */
-    async submitForm() {
-        const { targetCareer, collegeLevel, scores, personalInfo } = this.data
-
-        // 检查是否至少填了3门分数 (或者检查总分，这里简化为检查是否有输入)
-        const filledScores = Object.values(scores).filter(s => s && s.trim() !== '')
-        if (filledScores.length < 3) {
-            wx.showToast({
-                title: '请至少填写3门科目分数',
-                icon: 'none'
-            })
-            return
-        }
-
-        if (!targetCareer || !collegeLevel || !personalInfo) {
-            wx.showToast({
-                title: '请完善所有信息',
-                icon: 'none'
-            })
-            return
-        }
-
-        // 格式化分数信息字符串供AI使用
-        const scoreStr = `
-      目标院校层次: ${collegeLevel}
-      物理: ${scores.physics || 0}, 
-      化学: ${scores.chemistry || 0}, 
-      生物: ${scores.biology || 0}, 
-      政治: ${scores.politics || 0}, 
-      历史: ${scores.history || 0}, 
-      地理: ${scores.geography || 0}, 
-      技术: ${scores.technology || 0}
-    `
-
-        try {
-            // 生成前校验登录
-            await auth.ensureLogin()
-            const payload = encodeURIComponent(JSON.stringify({
-                targetCareer,
-                collegeLevel,
-                scoreDetail: scoreStr,
-                scores,
-                personalInfo,
-                partialEndIndex: 240
-            }))
-            wx.navigateTo({ url: `/pages/result/result?payload=${payload}` })
-        } catch (err) {
-            console.error(err)
-            wx.showModal({
-                title: '跳转失败',
-                content: err.message || '请稍后重试',
-                showCancel: false
-            })
-        }
+  onShow() {
+    const mbtiResult = wx.getStorageSync('mbtiResult')
+    if (mbtiResult && mbtiResult.type) {
+      this.setData({ mbti: mbtiResult.type })
     }
+  },
+
+  onInput(e) {
+    const field = e.currentTarget.dataset.field
+    this.setData({
+      [field]: e.detail.value
+    })
+  },
+
+  onScoreLevelChange(e) {
+    const index = Number(e.detail.value)
+    this.setData({
+      scoreLevelIndex: index,
+      scoreLevel: this.data.scoreLevels[index]
+    })
+  },
+
+  toggleSubject(e) {
+    const key = e.currentTarget.dataset.key
+    const selectedCount = this.data.subjects.filter(item => item.selected).length
+    const subjects = this.data.subjects.map(item => {
+      if (item.key !== key) return item
+      if (!item.selected && selectedCount >= 3) {
+        wx.showToast({ title: '最多选择3门选考科目', icon: 'none' })
+        return item
+      }
+      return { ...item, selected: !item.selected }
+    })
+    this.setData({
+      subjects,
+      selectedSubjectText: subjects.filter(item => item.selected).map(item => item.name).join(' + ') || '未选择'
+    })
+  },
+
+  selectCareerPlan(e) {
+    this.setData({
+      careerPlan: e.currentTarget.dataset.value
+    })
+  },
+
+  goToMbtiTest() {
+    wx.navigateTo({
+      url: '/pages/mbti-test/index',
+      fail: (err) => {
+        console.error('MBTI navigate failed', err)
+        wx.showToast({ title: '无法打开MBTI测试页', icon: 'none' })
+      }
+    })
+  },
+
+  async submitForm() {
+    const {
+      province,
+      totalScore,
+      rank,
+      scoreLevel,
+      subjects,
+      mbti,
+      interest,
+      careerPlan,
+      personalInfo
+    } = this.data
+
+    const selectedSubjects = subjects.filter(item => item.selected).map(item => item.name)
+
+    if (!province || !totalScore || !rank || !scoreLevel) {
+      wx.showToast({ title: '请完善高考基础信息', icon: 'none' })
+      return
+    }
+
+    if (selectedSubjects.length !== 3) {
+      wx.showToast({ title: '请选择3门选考科目', icon: 'none' })
+      return
+    }
+
+    if (!mbti || !interest || !personalInfo) {
+      wx.showToast({ title: '请完善性格兴趣和个人想法', icon: 'none' })
+      return
+    }
+
+    try {
+      await auth.ensureLogin()
+      const payload = encodeURIComponent(JSON.stringify({
+        targetCareer: '职业与志愿分析',
+        province,
+        totalScore,
+        rank,
+        scoreLevel,
+        selectedSubjects,
+        mbti: mbti.toUpperCase(),
+        interest,
+        careerPlan,
+        personalInfo,
+        scoreDetail: `省份:${province}, 总分:${totalScore}, 位次:${rank}, 层次:${scoreLevel}, 选科:${selectedSubjects.join('+')}, MBTI:${mbti.toUpperCase()}, 兴趣:${interest}, 路径:${careerPlan}`
+      }))
+      wx.navigateTo({ url: `/pages/result/result?payload=${payload}` })
+    } catch (err) {
+      console.error(err)
+      wx.showModal({
+        title: '提交失败',
+        content: err.message || '请稍后重试',
+        showCancel: false
+      })
+    }
+  }
 })

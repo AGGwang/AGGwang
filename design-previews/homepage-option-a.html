@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>职业推荐方案 A - 表单体验</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e8edf3;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #172033;
+    }
+    button, input, textarea {
+      font: inherit;
+    }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f7f9fc;
+      border-radius: 28px;
+      box-shadow: 0 28px 60px rgba(20, 35, 60, 0.22);
+      overflow: hidden;
+    }
+    .hero {
+      background: #0b5cff;
+      color: #fff;
+      padding: 30px 20px 22px;
+    }
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6ee7b7;
+    }
+    .saved {
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 10px 0 18px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .step {
+      min-height: 62px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.13);
+      padding: 10px;
+    }
+    .step strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .step span {
+      display: block;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .content {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #e4ebf5;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #1f2937;
+    }
+    .hint {
+      flex: none;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .mbti-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .chip {
+      height: 38px;
+      border: 1px solid #d9e2f1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .chip.active {
+      border-color: #0b5cff;
+      background: #eaf1ff;
+      color: #0b5cff;
+    }
+    .level-list {
+      display: grid;
+      gap: 8px;
+    }
+    .level {
+      min-height: 48px;
+      border: 1px solid #d9e2f1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .radio {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+    }
+    .level.active {
+      border-color: #0b5cff;
+      background: #eff5ff;
+    }
+    .level.active .radio {
+      border-color: #0b5cff;
+      box-shadow: inset 0 0 0 4px #eff5ff;
+      background: #0b5cff;
+    }
+    .level strong {
+      display: block;
+      color: #1f2937;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+    .level span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .field {
+      height: 44px;
+      border: 1px solid #d9e2f1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #334155;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .textarea {
+      width: 100%;
+      height: 118px;
+      resize: none;
+      border: 1px solid #d9e2f1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #334155;
+      padding: 11px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .textarea::placeholder {
+      color: #94a3b8;
+    }
+    .submit {
+      height: 52px;
+      border: 0;
+      border-radius: 8px;
+      background: #0b5cff;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      box-shadow: 0 12px 22px rgba(11, 92, 255, 0.24);
+    }
+    .preview {
+      display: grid;
+      gap: 10px;
+    }
+    .preview-row {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 10px;
+      align-items: start;
+      border-top: 1px solid #edf2f7;
+      padding-top: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .preview-row:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .preview-row strong {
+      color: #0b5cff;
+    }
+    .preview-row span {
+      color: #475569;
+    }
+    .consult {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+    .consult strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #7c2d12;
+    }
+    .consult span {
+      color: #9a3412;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .copy {
+      border: 0;
+      border-radius: 8px;
+      background: #ea580c;
+      color: #fff;
+      height: 38px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <section class="hero">
+      <div class="topline">
+        <div class="badge"><span class="pulse"></span>AI 职业推荐</div>
+        <div class="saved">约 3 分钟完成</div>
+      </div>
+      <h1>用 MBTI、个人想法和成绩层次生成职业路径</h1>
+      <p class="lead">适合做成新功能首页和填写页，一屏明确告诉学生填什么、能得到什么。</p>
+      <div class="steps">
+        <div class="step"><strong>01 输入</strong><span>MBTI、成绩层次、个人想法</span></div>
+        <div class="step"><strong>02 分析</strong><span>职业匹配、专业方向、风险点</span></div>
+        <div class="step"><strong>03 路径</strong><span>高中到大学的可执行计划</span></div>
+      </div>
+    </section>
+
+    <section class="content">
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">MBTI 类型</div>
+          <div class="hint">不知道可选“不确定”</div>
+        </div>
+        <div class="mbti-grid">
+          <button class="chip active">INTJ</button><button class="chip">INTP</button><button class="chip">ENTJ</button><button class="chip">ENTP</button>
+          <button class="chip">INFJ</button><button class="chip">INFP</button><button class="chip">ENFJ</button><button class="chip">ENFP</button>
+          <button class="chip">ISTJ</button><button class="chip">ISFJ</button><button class="chip">ESTJ</button><button class="chip">不确定</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">当前成绩层次</div>
+          <div class="hint">用于判断路径可行性</div>
+        </div>
+        <div class="level-list">
+          <div class="level"><span class="radio"></span><div><strong>冲刺层</strong><span>年级前 10%，可考虑强校强专业路线</span></div></div>
+          <div class="level active"><span class="radio"></span><div><strong>稳定层</strong><span>一本线附近，优先做专业和城市组合</span></div></div>
+          <div class="level"><span class="radio"></span><div><strong>提升层</strong><span>本科线附近，先稳录取再规划细分方向</span></div></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">补充信息</div>
+          <div class="hint">越具体越准确</div>
+        </div>
+        <div class="field-row">
+          <div class="field">优势科目 <span>英语/历史</span></div>
+          <div class="field">偏好方向 <span>稳定成长</span></div>
+        </div>
+        <div style="height: 10px;"></div>
+        <textarea class="textarea" placeholder="例如：喜欢和人沟通，数学一般，希望工作稳定但有成长空间，不想完全做重复性工作。"></textarea>
+      </section>
+
+      <button class="submit">生成 AI 职业推荐</button>
+
+      <section class="section preview">
+        <div class="section-head">
+          <div class="section-title">将生成这些内容</div>
+          <div class="hint">免费预览</div>
+        </div>
+        <div class="preview-row"><strong>推荐职业</strong><span>给出 3 个职业方向和匹配理由，不只给单一答案。</span></div>
+        <div class="preview-row"><strong>可行路径</strong><span>拆成近期、高中阶段、大学阶段，每一步都有行动建议。</span></div>
+        <div class="preview-row"><strong>风险提醒</strong><span>指出成绩层次、专业门槛和性格偏好之间的冲突。</span></div>
+      </section>
+
+      <section class="section consult">
+        <div>
+          <strong>需要老师继续看具体情况？</strong>
+          <span>结果页可复制老师 VX，进一步做一对一咨询。</span>
+        </div>
+        <button class="copy">复制 VX</button>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

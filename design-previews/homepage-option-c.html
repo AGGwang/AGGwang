@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>职业推荐方案 C - 咨询转化</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e6eef0;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #14213d;
+    }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      border-radius: 28px;
+      background: #f7faf9;
+      box-shadow: 0 28px 60px rgba(20, 33, 61, 0.22);
+      overflow: hidden;
+    }
+    .hero {
+      padding: 30px 20px 20px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42)),
+        repeating-linear-gradient(90deg, #edf7f4 0, #edf7f4 24px, #e4f0ec 24px, #e4f0ec 48px);
+      border-bottom: 1px solid #dbe7e3;
+    }
+    .label {
+      color: #0f766e;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    h1 {
+      margin: 10px 0;
+      font-size: 28px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 0;
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.7;
+    }
+    .content {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .progress {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .progress div {
+      height: 6px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+    .progress div:first-child,
+    .progress div:nth-child(2) {
+      background: #0f766e;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #dbe7e3;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+    .option {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+      border: 1px solid #dbe7e3;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdfc;
+      font-size: 13px;
+      color: #334155;
+    }
+    .radio {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+    }
+    .option.active {
+      border-color: #0f766e;
+      background: #ecfdf5;
+      color: #0f766e;
+      font-weight: 800;
+    }
+    .active .radio {
+      border-color: #0f766e;
+      box-shadow: inset 0 0 0 4px #ecfdf5;
+      background: #0f766e;
+    }
+    .textarea {
+      height: 92px;
+      border: 1px solid #dbe7e3;
+      border-radius: 8px;
+      background: #fbfdfc;
+      padding: 11px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .result {
+      display: grid;
+      gap: 8px;
+    }
+    .path {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      padding: 10px;
+      font-size: 13px;
+    }
+    .path strong {
+      color: #0f766e;
+      width: 54px;
+      flex: none;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 104px;
+      gap: 10px;
+    }
+    .primary,
+    .secondary {
+      height: 48px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .primary {
+      background: #0f766e;
+      color: #fff;
+    }
+    .secondary {
+      background: #fde68a;
+      color: #713f12;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <section class="hero">
+      <div class="label">职业方向校准</div>
+      <h1>先判断适配度，再决定是否找老师深聊</h1>
+      <p class="lead">适合突出咨询转化：AI 给出初步职业路径，复杂个案引导添加老师 VX。</p>
+    </section>
+
+    <section class="content">
+      <div class="progress"><div></div><div></div><div></div></div>
+
+      <section class="card">
+        <h2>当前成绩层次</h2>
+        <div class="options">
+          <div class="option"><span class="radio"></span><span>顶尖层次：年级前 10%，冲刺强基/985</span></div>
+          <div class="option active"><span class="radio"></span><span>中高层次：一本线附近，重视专业选择</span></div>
+          <div class="option"><span class="radio"></span><span>基础层次：先稳住本科，再做专业路径</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>MBTI 与个人想法</h2>
+        <div class="options">
+          <div class="option active"><span class="radio"></span><span>INFJ：重视意义感、稳定性和助人价值</span></div>
+          <div class="option"><span class="radio"></span><span>还不确定 MBTI，先按兴趣和行为描述分析</span></div>
+        </div>
+        <div style="height: 10px;"></div>
+        <div class="textarea">我希望未来工作稳定，有成长空间，不排斥和人沟通，但不想纯销售...</div>
+      </section>
+
+      <section class="card">
+        <h2>AI 初步路径</h2>
+        <div class="result">
+          <div class="path"><strong>方向 1</strong><span>教育学、心理学、社会工作相关路径</span></div>
+          <div class="path"><strong>方向 2</strong><span>人力资源、组织发展、用户研究相关路径</span></div>
+          <div class="path"><strong>行动</strong><span>补齐数学/英语短板，增加志愿服务和访谈实践</span></div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button class="primary">生成完整路径</button>
+        <button class="secondary">加老师 VX</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -44,26 +44,47 @@ async function callAI(targetCareer, score, personalInfo) {
 
   // 创建模型组并指定具体模型
   const model = ai.createModel('hunyuan-exp')
-  const res = await model.streamText({
-    data: {
-      model: 'hunyuan-t1-latest',
-      messages: [
-        { role: 'user', content: buildPrompt(targetCareer, score, personalInfo) }
-      ],
-      temperature: 0.7
-    }
-  })
-
-  // 接收文本流
+  const modelName = 'hunyuan-turbos-latest'
   let fullText = ''
-  for await (let str of res.textStream) {
-    fullText += str
+
+  try {
+    const res = await model.streamText({
+      data: {
+        model: modelName,
+        messages: [
+          { role: 'user', content: buildPrompt(targetCareer, score, personalInfo) }
+        ],
+        temperature: 0.7
+      }
+    })
+
+    for await (let str of res.textStream) {
+      fullText += str
+    }
+  } catch (err) {
+    console.warn(`模型 ${modelName} streamText 调用失败`, err)
   }
 
-  // 接收事件流（便于排障与统计），不影响业务返回
-  for await (let event of res.eventStream) {
-    // 可按需记录：finish_reason、usage 等
-    console.log('AI Event:', event && event.type ? event.type : event)
+  if (!fullText) {
+    try {
+      const res = await model.generateText({
+        data: {
+          model: modelName,
+          messages: [
+            { role: 'user', content: buildPrompt(targetCareer, score, personalInfo) }
+          ],
+          temperature: 0.7
+        }
+      })
+      fullText = res?.text || res?.content || res?.choices?.[0]?.message?.content || ''
+    } catch (err) {
+      console.warn(`模型 ${modelName} generateText 调用失败`, err)
+      throw err
+    }
+  }
+
+  if (!fullText) {
+    throw new Error(`模型生成内容为空。已尝试 ${modelName}`)
   }
 
   // 解析 JSON 结构；若解析失败则降级

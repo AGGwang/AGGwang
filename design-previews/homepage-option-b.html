@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>职业推荐方案 B - 报告结果</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e5e7eb;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #111827;
+    }
+    button {
+      font: inherit;
+    }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      border-radius: 28px;
+      background: #fbfbf8;
+      box-shadow: 0 28px 60px rgba(17, 24, 39, 0.22);
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 86px;
+    }
+    .header {
+      padding: 28px 20px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid #e7e5df;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      color: #6b7280;
+      font-size: 12px;
+    }
+    .status {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      color: #047857;
+      font-weight: 900;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+    .sub {
+      margin: 10px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .body {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .metric {
+      background: #fff;
+      border: 1px solid #e7e5df;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 74px;
+    }
+    .metric span {
+      display: block;
+      font-size: 11px;
+      color: #78716c;
+      margin-bottom: 8px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.25;
+      color: #1f2937;
+      word-break: keep-all;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #e7e5df;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #1f2937;
+    }
+    .section-note {
+      color: #78716c;
+      font-size: 12px;
+    }
+    .career-list {
+      display: grid;
+      gap: 10px;
+    }
+    .career {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 10px;
+      align-items: start;
+      border-top: 1px solid #f0eee8;
+      padding-top: 10px;
+    }
+    .career:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .rank {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #eef2ff;
+      color: #3730a3;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+    .career-main {
+      min-width: 0;
+    }
+    .career-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .career-name {
+      font-size: 14px;
+      font-weight: 900;
+      color: #1f2937;
+      line-height: 1.35;
+    }
+    .match {
+      flex: none;
+      font-size: 12px;
+      font-weight: 900;
+      color: #047857;
+      background: #ecfdf5;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    .career-desc {
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .bar {
+      height: 6px;
+      border-radius: 999px;
+      background: #ede9dd;
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #10b981;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      border-radius: 999px;
+      padding: 0 9px;
+      background: #f5f5f0;
+      border: 1px solid #e7e5df;
+      color: #57534e;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .path-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .path {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding-top: 10px;
+      border-top: 1px solid #f0eee8;
+    }
+    .path:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .path strong {
+      color: #92400e;
+      background: #fef3c7;
+      border-radius: 8px;
+      min-height: 28px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+    .path span {
+      color: #4b5563;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .risk {
+      display: grid;
+      gap: 8px;
+    }
+    .risk-row {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 9px;
+      align-items: start;
+      color: #4b5563;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .risk-row i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      margin-top: 6px;
+    }
+    .bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #111827;
+      color: #fff;
+      padding: 12px 16px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .bottom strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .bottom span {
+      display: block;
+      color: #d1d5db;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .button {
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 13px;
+      background: #f59e0b;
+      color: #111827;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <section class="header">
+      <div class="nav">
+        <span>AI 职业报告</span>
+        <span class="status"><i class="dot"></i>已生成</span>
+      </div>
+      <h1>把推荐结果做得更像一份可执行报告</h1>
+      <p class="sub">适合用于结果页：先给学生明确方向，再引导复制老师 VX 做深度咨询。</p>
+    </section>
+
+    <section class="body">
+      <div class="summary">
+        <div class="metric"><span>MBTI</span><strong>ENFJ</strong></div>
+        <div class="metric"><span>成绩层次</span><strong>一本线</strong></div>
+        <div class="metric"><span>偏好</span><strong>沟通稳定</strong></div>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">AI 推荐职业 Top 3</div>
+          <div class="section-note">按匹配度排序</div>
+        </div>
+        <div class="career-list">
+          <div class="career">
+            <div class="rank">1</div>
+            <div class="career-main">
+              <div class="career-top"><div class="career-name">心理咨询与教育规划</div><div class="match">92%</div></div>
+              <div class="career-desc">匹配共情、表达和长期陪伴型优势，适合教育学、心理学、应用心理等专业方向。</div>
+              <div class="bar"><i style="width: 92%;"></i></div>
+            </div>
+          </div>
+          <div class="career">
+            <div class="rank">2</div>
+            <div class="career-main">
+              <div class="career-top"><div class="career-name">用户研究与品牌策略</div><div class="match">86%</div></div>
+              <div class="career-desc">适合文理交叉、沟通洞察和结构化分析能力，后续可走市场、产品、咨询方向。</div>
+              <div class="bar"><i style="width: 86%;"></i></div>
+            </div>
+          </div>
+          <div class="career">
+            <div class="rank">3</div>
+            <div class="career-main">
+              <div class="career-top"><div class="career-name">公共管理与社会服务</div><div class="match">81%</div></div>
+              <div class="career-desc">稳定性较强，适合重视社会价值和组织协作的学生，可结合城市与院校层次选择。</div>
+              <div class="bar"><i style="width: 81%;"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">推荐专业方向</div>
+          <div class="section-note">用于选科和志愿判断</div>
+        </div>
+        <div class="tags">
+          <span class="tag">应用心理学</span>
+          <span class="tag">教育学</span>
+          <span class="tag">社会学</span>
+          <span class="tag">新闻传播</span>
+          <span class="tag">工商管理</span>
+          <span class="tag">公共事业管理</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">可行路径</div>
+          <div class="section-note">从现在开始做</div>
+        </div>
+        <div class="path-grid">
+          <div class="path"><strong>近期</strong><span>明确专业大类，补齐数学和英语短板，保留 2 个备选方向，避免只押单一职业。</span></div>
+          <div class="path"><strong>高中</strong><span>围绕目标方向积累访谈、志愿服务、社团组织和研究性学习经历。</span></div>
+          <div class="path"><strong>大学</strong><span>优先选择可转向空间大的专业，尽早做实习、证书和作品集，验证职业适配度。</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">需要注意</div>
+          <div class="section-note">AI 初筛结论</div>
+        </div>
+        <div class="risk">
+          <div class="risk-row"><i></i><span>MBTI 只能作为辅助参考，最终要结合真实兴趣、成绩趋势和专业限制。</span></div>
+          <div class="risk-row"><i></i><span>如果目标院校层次较高，需要把路径拆成冲刺方案和保底方案。</span></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <div>
+        <strong>让老师看具体分数和学校？</strong>
+        <span>复制老师 VX，继续做一对一咨询。</span>
+      </div>
+      <button class="button">复制 VX</button>
+    </section>
+  </main>
+</body>
+</html>

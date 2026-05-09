@@ -1,38 +1,45 @@
-<!--pages/contact/contact.wxml-->
-<view class="container">
-  <view class="contact-card">
-    <view class="contact-header">
-      <text class="title">联系与反馈</text>
-      <text class="subtitle">我们在意您的每一个声音</text>
+<view class="page">
+  <view class="hero compact">
+    <view class="topline">
+      <view class="badge"><view class="dot"></view><text>联系反馈</text></view>
+      <text class="top-note">客服</text>
     </view>
-    
-    <view class="action-list">
-      <!-- 联系客服按钮 -->
-      <button class="action-item" open-type="contact">
-        <view class="content">
-          <text class="label">在线客服</text>
-          <text class="desc">工作日 9:00-18:00 在线服务</text>
+    <text class="hero-title">联系与反馈</text>
+    <text class="hero-desc">在线客服、反馈和邮箱咨询都保留，文案更贴合志愿填报场景。</text>
+  </view>
+
+  <view class="content">
+    <view class="section">
+      <button class="row-item button-row" open-type="contact">
+        <view class="mark">客</view>
+        <view>
+          <text class="row-title">在线客服</text>
+          <text class="row-desc">工作日 9:00-18:00，处理登录、支付和报告问题。</text>
         </view>
-        <view class="arrow">></view>
-      </button>
-      
-      <!-- 意见反馈按钮 -->
-      <button class="action-item" open-type="feedback">
-        <view class="content">
-          <text class="label">意见反馈 / 问题上报</text>
-          <text class="desc">帮助我们做得更好</text>
-        </view>
-        <view class="arrow">></view>
+        <text class="state-label">进入</text>
       </button>
 
-      <!-- 邮箱咨询 -->
-      <view class="action-item" bindtap="copyEmail">
-        <view class="content">
-          <text class="label">商务咨询</text>
-          <text class="desc">点击复制邮箱：paul7in3wechat@outlook.com</text>
+      <button class="row-item button-row" open-type="feedback">
+        <view class="mark now">反</view>
+        <view>
+          <text class="row-title">意见反馈 / 问题上报</text>
+          <text class="row-desc">报告内容异常、生成失败、页面问题。</text>
         </view>
-        <view class="arrow">></view>
+        <text class="state-label">进入</text>
+      </button>
+
+      <view class="row-item" bindtap="copyEmail">
+        <view class="mark">邮</view>
+        <view>
+          <text class="row-title">商务咨询</text>
+          <text class="row-desc">paul7in3wechat@outlook.com</text>
+        </view>
+        <text class="state-label">复制</text>
       </view>
+    </view>
+
+    <view class="section warn">
+      <text class="paragraph">涉及具体志愿表复核，请优先添加老师 VX 或提供完整分数、位次、省份和选科信息。</text>
     </view>
   </view>
 </view>

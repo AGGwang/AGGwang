@@ -1,74 +1,284 @@
-<!-- pages/result/result.wxml -->
-<view class="container">
-    <!-- 生成中状态 -->
-    <view class="generating-card" wx:if="{{generating}}">
-        <view class="gen-header">
-            <text class="gen-title">AI 正在生成 {{record.targetCareer}} 职业规划</text>
-            <text class="gen-subtitle">实时输出 (仅展示部分内容，更多需解锁)</text>
-            <text class="gen-tip">（生成速度较慢请耐心等待不要退出）</text>
-        </view>
-        <view class="progress-bar">
-            <view class="progress-inner"></view>
-        </view>
-        <!-- 生成时也展示部分预览内容 -->
-        <scroll-view class="content-scroll generating-preview" scroll-y="true">
-            <text class="content-text">{{displayText}}</text>
-        </scroll-view>
+<view class="page footer-space">
+  <view class="hero compact">
+    <view class="topline">
+      <view class="badge">
+        <view class="dot"></view>
+        <text>{{errorMessage ? '报告生成失败' : (generating ? 'AI 正在分析' : '报告已生成')}}</text>
+      </view>
+      <text class="top-note">{{generating ? '生成中' : (errorMessage ? '需重试' : '职业结果')}}</text>
     </view>
-    <!-- 结果展示卡片 -->
-    <block wx:else>
-        <view class="report-card">
-            <view class="report-header">
-                <text class="career-title">{{record.targetCareer}} 职业规划</text>
-                <view class="score-section">
-                    <text class="score-label">当前分数</text>
-                    <view class="score-grid">
-                        <block wx:for="{{record.scoreList}}" wx:key="name">
-                            <view class="score-item">
-                                <text class="score-subject">{{item.name}}</text>
-                                <text class="score-num">{{item.val}}</text>
-                            </view>
-                        </block>
-                    </view>
+    <text class="hero-title">{{generating ? '正在生成职业与志愿填报参考方案' : (errorMessage ? '报告生成或解析失败' : '职业选择与志愿填报参考方案')}}</text>
+    <text class="hero-desc">{{generating ? '正在结合分数、位次、选科、MBTI、兴趣和职业路径规划。请不要退出页面。' : (errorMessage ? '本页不会使用前端默认假数据兜底，请返回修改信息后重新生成。' : '以下内容由 AI 根据本次填写的信息生成，仅作为职业选择和志愿填报参考。')}}</text>
+  </view>
+
+  <view class="content" wx:if="{{loading}}">
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">正在加载报告</text>
+        <text class="hint">请稍候</text>
+      </view>
+      <text class="paragraph">正在读取 AI 报告数据...</text>
+    </view>
+  </view>
+
+  <view class="content" wx:elif="{{generating}}">
+    <view class="section">
+      <view class="progress-head">
+        <text class="section-title">分析进度</text>
+        <text class="progress-num">生成中</text>
+      </view>
+      <view class="progress"><view></view></view>
+    </view>
+
+    <view class="section">
+      <view class="loading-step">
+        <view class="mark">1</view>
+        <view>
+          <text class="row-title">读取基础信息</text>
+          <text class="row-desc">省份、总分、位次、成绩层次、选考科目。</text>
+        </view>
+        <text class="state-label">处理中</text>
+      </view>
+      <view class="loading-step">
+        <view class="mark">2</view>
+        <view>
+          <text class="row-title">匹配职业与专业</text>
+          <text class="row-desc">结合 MBTI、兴趣、职业路径规划和个人想法。</text>
+        </view>
+        <text class="state-label">处理中</text>
+      </view>
+      <view class="loading-step">
+        <view class="mark now">3</view>
+        <view>
+          <text class="row-title">校验报告结构</text>
+          <text class="row-desc">确保结果页每个模块都来自 AI 返回的数据。</text>
+        </view>
+        <text class="state-label">进行中</text>
+      </view>
+    </view>
+
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">生成状态</text>
+        <text class="hint">AI 返回</text>
+      </view>
+      <text class="paragraph">{{displayText || 'AI 正在组织报告内容...'}}</text>
+    </view>
+  </view>
+
+  <view class="content" wx:elif="{{errorMessage}}">
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">错误信息</text>
+        <text class="hint">未生成报告</text>
+      </view>
+      <text class="paragraph">{{errorMessage}}</text>
+    </view>
+  </view>
+
+  <view class="content" wx:else>
+    <view class="summary">
+      <view class="metric">
+        <text>成绩层次</text>
+        <text class="metric-value">{{record.scoreLevel || record.collegeLevel || '未填写'}}</text>
+      </view>
+      <view class="metric">
+        <text>路径规划</text>
+        <text class="metric-value">{{record.careerPlan || '未填写'}}</text>
+      </view>
+      <view class="metric">
+        <text>性格兴趣</text>
+        <text class="metric-value">{{record.mbti || '未填写'}} {{record.interest || ''}}</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">核心结论</text>
+        <text class="hint">AI 生成</text>
+      </view>
+      <view class="verdict">
+        <text class="verdict-title">{{report.coreConclusion.title}}</text>
+        <text class="verdict-desc">{{report.coreConclusion.summary}}</text>
+      </view>
+      <view class="score-list">
+        <view class="score-row" wx:for="{{report.scoreRows}}" wx:key="label">
+          <text>{{item.label}}</text>
+          <view class="score-track"><view style="width: {{item.score}}%;"></view></view>
+          <text>{{item.score}}</text>
+          <text class="score-reason">{{item.reason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">推荐职业方向</text>
+        <text class="hint">至少 3 个</text>
+      </view>
+      <view class="career-list">
+        <view class="career" wx:for="{{report.careerOptions}}" wx:key="rank">
+          <view class="rank">{{item.rank}}</view>
+          <view>
+            <view class="career-top">
+              <text class="career-name">{{item.name}}</text>
+              <text class="match">{{item.match}}</text>
+            </view>
+            <text class="career-desc">{{item.desc}}</text>
+            <view class="career-tags" wx:if="{{item.majorCategories.length}}">
+              <text class="tag" wx:for="{{item.majorCategories}}" wx:for-item="major" wx:key="*this">{{major}}</text>
+            </view>
+            <view class="career-detail-block">
+              <text class="career-detail-title">具体工作内容</text>
+              <view class="mini-list">
+                <text wx:for="{{item.workContent}}" wx:for-item="work" wx:key="*this">· {{work}}</text>
+              </view>
+            </view>
+            <view class="career-detail-block">
+              <text class="career-detail-title">核心能力要求</text>
+              <view class="mini-list">
+                <text wx:for="{{item.requiredAbilities}}" wx:for-item="ability" wx:key="*this">· {{ability}}</text>
+              </view>
+            </view>
+            <view class="career-detail-block">
+              <text class="career-detail-title">大学期间准备</text>
+              <view class="mini-list">
+                <text wx:for="{{item.collegePreparation}}" wx:for-item="prep" wx:key="*this">· {{prep}}</text>
+              </view>
+            </view>
+            <view class="career-detail-block">
+              <text class="career-detail-title">职业收入估计</text>
+              <view class="career-income">
+                <view>
+                  <text>1-3 年</text>
+                  <text>{{item.income.early}}</text>
                 </view>
+                <view>
+                  <text>3-5 年</text>
+                  <text>{{item.income.middle}}</text>
+                </view>
+                <view>
+                  <text>成熟阶段</text>
+                  <text>{{item.income.mature}}</text>
+                </view>
+              </view>
+              <text class="career-income-note">{{item.income.note}}</text>
             </view>
-            <scroll-view class="content-scroll" scroll-y="true">
-                <text class="content-text">{{displayText}}</text>
-                <!-- 未付费时显示占位内容以撑开高度，确保模糊效果覆盖下方 -->
-                <block wx:if="{{!isPaid}}">
-                    <view class="blur-placeholder">
-                        <text>以下内容需解锁查看...</text>
-                        <text>详细学习路径规划...</text>
-                        <text>未来职业前景分析...</text>
-                        <text>专业选科建议...</text>
-                        <text>...</text>
-                        <text>更多深度分析...</text>
-                        <text>行业薪资水平...</text>
-                        <text>就业竞争分析...</text>
-                    </view>
-                </block>
-            </scroll-view>
-            <!-- 模糊遮罩 (置于 scroll-view 外部或作为覆盖层) -->
-            <view class="gauss-mask" wx:if="{{!isPaid}}"></view>
-        </view>
-        <!-- 专人规划引导卡片 (仅在已付费且非生成状态显示) -->
-        <view class="expert-card" wx:if="{{isPaid}}">
-            <view class="expert-info">
-                <text class="expert-title">需要更详细的个性化指导？</text>
-                <text class="expert-desc">预约资深规划师，一对一为您定制升学路径</text>
+            <view class="career-detail-block">
+              <text class="career-detail-title">可行路径</text>
+              <text class="career-path">{{item.path}}</text>
             </view>
-            <button class="expert-btn" bindtap="handleContactExpert">联系专人规划</button>
+            <text class="career-caution" wx:if="{{item.caution}}">谨慎点：{{item.caution}}</text>
+            <view class="bar"><view style="width: {{item.percent}}%;"></view></view>
+          </view>
         </view>
-    </block>
-    <!-- 底部付费栏 (始终固定) -->
-    <view class="pay-footer" wx:if="{{!isPaid && !generating}}">
-        <view class="pay-info">
-            <text class="pay-tip">已为您实时展示部分内容，解锁查看完整 3000字+ 深度规划报告</text>
-            <view class="price-box">
-                <text class="original-price">¥{{record.originalPrice}}</text>
-                <text class="current-price">¥{{record.price}}</text>
-            </view>
-        </view>
-        <button class="unlock-btn" bindtap="handlePay">立即解锁</button>
+      </view>
     </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">适配专业大类</text>
+        <text class="hint">结合选科</text>
+      </view>
+      <view class="major-groups">
+        <view class="major-group" wx:for="{{report.majorGroups}}" wx:key="label">
+          <text class="major-title">{{item.label}}</text>
+          <view class="tags">
+            <text class="tag" wx:for="{{item.items}}" wx:for-item="major" wx:key="*this">{{major}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">具体工作内容</text>
+        <text class="hint">{{primaryCareerName || '重点职业'}}</text>
+      </view>
+      <view class="job-detail">
+        <view class="job-row" wx:for="{{report.jobDetails}}" wx:key="label">
+          <text class="job-label">{{item.label}}</text>
+          <text class="job-text">{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">职业收入估计</text>
+        <text class="hint">AI 估算</text>
+      </view>
+      <view class="income-grid">
+        <view class="income-card" wx:for="{{report.incomeEstimates}}" wx:key="stage">
+          <text>{{item.stage}}</text>
+          <text class="income-value">{{item.range}}</text>
+          <text class="income-note">{{item.note}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">后续职业发展规划</text>
+        <text class="hint">{{record.careerPlan || '职业路径'}}</text>
+      </view>
+      <view class="career-roadmap">
+        <view class="roadmap-step" wx:for="{{report.roadmap}}" wx:key="stage">
+          <text class="stage">{{item.stage}}</text>
+          <text class="roadmap-text">{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">志愿填报策略</text>
+        <text class="hint">冲稳保</text>
+      </view>
+      <view class="strategy">
+        <view class="strategy-row" wx:for="{{report.strategy}}" wx:key="label">
+          <text class="strategy-label {{item.style}}">{{item.label}}</text>
+          <text>{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">风险提醒与人工复核点</text>
+        <text class="hint">需确认</text>
+      </view>
+      <view class="avoid-list">
+        <view class="avoid-item" wx:for="{{report.riskWarnings}}" wx:key="*this">
+          <text>!</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">AI 完整报告</text>
+        <text class="hint">{{isPaid ? '已解锁' : '预览'}}</text>
+      </view>
+      <text class="report-text">{{displayText}}</text>
+    </view>
+
+    <view class="section dark" wx:if="{{isPaid}}">
+      <view class="section-head">
+        <text class="section-title dark-title">老师 VX 咨询</text>
+        <text class="hint dark-hint">可复制</text>
+      </view>
+      <text class="dark-text">复杂个案可添加老师继续看院校组合、专业组风险和保底方案。</text>
+      <button class="orange-btn inline" bindtap="handleContactExpert">复制老师 VX</button>
+    </view>
+  </view>
+
+  <view class="bottom" wx:if="{{!isPaid && !generating && !loading && !errorMessage}}">
+    <view>
+      <text class="bottom-title">解锁完整报告</text>
+      <text class="bottom-desc">查看完整路径、收入、工作内容与专业组风险分析。</text>
+    </view>
+    <button class="orange-btn" bindtap="handlePay">¥{{record.price}} 解锁</button>
+  </view>
 </view>

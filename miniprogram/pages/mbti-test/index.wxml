@@ -1,0 +1,139 @@
+<view class="page">
+  <view class="hero compact">
+    <view class="topline">
+      <view class="badge"><view class="dot"></view><text>{{finished ? 'MBTI 结果' : 'MBTI 测试'}}</text></view>
+      <text class="top-note">{{finished ? '可回填' : '答题中'}}</text>
+    </view>
+    <text wx:if="{{finished}}" class="hero-title">你的测试结果偏向 {{resultType}}</text>
+    <text wx:else class="hero-title">用 16 道轻量题判断你的性格倾向</text>
+    <text class="hero-desc">测试结果只作为职业适配参考，会自动回填到填写页的 MBTI 字段，不替代分数、位次和选科限制。</text>
+  </view>
+
+  <view class="content" wx:if="{{!finished}}">
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">测试进度</text>
+        <text class="hint">第 {{currentIndex + 1}} / {{questions.length}} 题</text>
+      </view>
+      <view class="mbti-progress">
+        <block wx:for="{{progressBars}}" wx:key="index">
+          <view class="{{item ? 'active' : ''}}"></view>
+        </block>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">正在判断的维度</text>
+        <text class="hint">{{currentQuestion.left}} / {{currentQuestion.right}}</text>
+      </view>
+      <view class="mbti-axis">
+        <view class="axis-card">
+          <text class="axis-code">E</text>
+          <text class="axis-desc">外向能量</text>
+        </view>
+        <view class="axis-card">
+          <text class="axis-code">I</text>
+          <text class="axis-desc">内向能量</text>
+        </view>
+        <view class="axis-card">
+          <text class="axis-code">N</text>
+          <text class="axis-desc">抽象直觉</text>
+        </view>
+        <view class="axis-card">
+          <text class="axis-code">S</text>
+          <text class="axis-desc">现实细节</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="question-card">
+      <text class="question-kicker">情境题 {{currentIndex + 1}}</text>
+      <text class="question-text">{{currentQuestion.text}}</text>
+      <view class="scale">
+        <block wx:for="{{scaleOptions}}" wx:key="value">
+          <view class="scale-btn {{currentAnswer === item.value ? 'active' : ''}}" data-value="{{item.value}}" catchtap="selectAnswer">
+            <text>{{item.label}}</text>
+          </view>
+        </block>
+      </view>
+      <view class="scale-labels">
+        <text>更偏 {{currentQuestion.left}}</text>
+        <text>更偏 {{currentQuestion.right}}</text>
+      </view>
+    </view>
+
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">测试说明</text>
+        <text class="hint">非诊断</text>
+      </view>
+      <text class="paragraph">MBTI 不能决定专业选择，只用于辅助理解沟通方式、决策偏好和学习动力来源。</text>
+    </view>
+
+    <view class="action-grid">
+      <button class="secondary-btn" bindtap="prevQuestion">上一题</button>
+      <button class="primary-btn" bindtap="nextQuestion">{{currentIndex === questions.length - 1 ? '查看结果' : '下一题'}}</button>
+    </view>
+  </view>
+
+  <view class="content" wx:else>
+    <view class="type-card">
+      <view class="type-code">{{resultType}}</view>
+      <view>
+        <text class="type-name">{{resultName}}</text>
+        <text class="type-desc">{{resultDesc}}</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">维度倾向</text>
+        <text class="hint">测试估算</text>
+      </view>
+      <view class="dimension-grid">
+        <block wx:for="{{dimensions}}" wx:key="label">
+          <view class="dimension">
+            <text>{{item.label}}</text>
+            <view class="dimension-track"><view style="width: {{item.score}}%;"></view></view>
+            <text>{{item.score}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">对志愿分析的影响</text>
+        <text class="hint">自动带入</text>
+      </view>
+      <view class="row-item">
+        <view class="mark">优</view>
+        <view>
+          <text class="row-title">适合方向</text>
+          <text class="row-desc">{{fitText}}</text>
+        </view>
+        <text class="state-label">参考</text>
+      </view>
+      <view class="row-item">
+        <view class="mark now">慎</view>
+        <view>
+          <text class="row-title">需要留意</text>
+          <text class="row-desc">{{riskText}}</text>
+        </view>
+        <text class="state-label">复核</text>
+      </view>
+    </view>
+
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">下一步</text>
+        <text class="hint">回填表单</text>
+      </view>
+      <text class="paragraph">建议把 {{resultType}} 回填到填写页，同时补充真实兴趣、分数位次和家庭偏好，避免只凭性格类型做决定。</text>
+    </view>
+
+    <button class="primary-btn" bindtap="useResult">使用 {{resultType}} 并返回填写页</button>
+    <button class="secondary-full" bindtap="restart">重新测试</button>
+  </view>
+</view>

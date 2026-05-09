@@ -1,31 +1,60 @@
-// 云函数入口文件
 const cloud = require('wx-server-sdk')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
+
 const db = cloud.database()
 
-/**
- * 写入生成的报告记录
- * @param {{targetCareer:string, scoreDetail:string, personalInfo:string, fullContent:string, summary:string, partialEndIndex:number}} event
- * @returns {{success:boolean, recordId?:string, errMsg?:string}}
- */
-exports.main = async (event, context) => {
+exports.main = async (event) => {
   const wxContext = cloud.getWXContext()
-  const { targetCareer, scoreDetail, personalInfo, collegeLevel, fullContent, summary, partialEndIndex = 240 } = event
+  const {
+    targetCareer,
+    province,
+    totalScore,
+    rank,
+    scoreLevel,
+    selectedSubjects,
+    mbti,
+    interest,
+    careerPlan,
+    personalInfo,
+    scoreDetail,
+    fullContent,
+    summary,
+    structuredReport,
+    rawAiContent,
+    partialEndIndex = 360
+  } = event
 
   try {
+    if (!fullContent || !summary || !structuredReport) {
+      return {
+        success: false,
+        errMsg: '缺少AI完整报告或结构化报告数据'
+      }
+    }
+
     const record = {
       _openid: wxContext.OPENID,
-      targetCareer,
-      scoreDetail,
-      personalInfo,
-      collegeLevel: collegeLevel || '', // 保存院校层次
+      targetCareer: targetCareer || '职业与志愿分析',
+      province: province || '',
+      totalScore: totalScore || '',
+      rank: rank || '',
+      scoreLevel: scoreLevel || '',
+      selectedSubjects: Array.isArray(selectedSubjects) ? selectedSubjects : [],
+      mbti: mbti || '',
+      interest: interest || '',
+      careerPlan: careerPlan || '',
+      personalInfo: personalInfo || '',
+      scoreDetail: scoreDetail || '',
       fullContent,
       summary,
+      structuredReport: structuredReport || null,
+      rawAiContent: rawAiContent || '',
       partialEndIndex,
       isPaid: false,
       price: 5.99,
       originalPrice: 19.9,
-      createTime: db.serverDate(),
+      createTime: db.serverDate()
     }
 
     const addRes = await db.collection('records').add({ data: record })
@@ -35,4 +64,3 @@ exports.main = async (event, context) => {
     return { success: false, errMsg: err.message }
   }
 }
-

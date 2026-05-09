@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/inputpage/inputpage",
+    "pages/mbti-test/index",
     "pages/result/result",
     "pages/mine/mine",
     "pages/contact/contact",
@@ -10,7 +11,7 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "AI 选科与职业规划",
+    "navigationBarTitleText": "高考后决策助手",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "usingComponents": {
@@ -18,8 +19,8 @@
   },
   "tabBar": {
     "custom": true,
-    "color": "#999999",
-    "selectedColor": "#0052d9",
+    "color": "#64748b",
+    "selectedColor": "#13315c",
     "backgroundColor": "#ffffff",
     "list": [
       {

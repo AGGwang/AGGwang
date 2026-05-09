@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高考志愿职业参考 - 加载页</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e7edf2;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #172033;
+    }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f8fafc;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 28px 62px rgba(15, 23, 42, 0.22);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .header {
+      background: #13315c;
+      color: #fff;
+      padding: 30px 20px 22px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #d9f99d;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(217, 249, 157, 0.38);
+      border-top-color: #d9f99d;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 {
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .content {
+      padding: 16px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+    .progress-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .progress-head span {
+      color: #2563eb;
+    }
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .progress div {
+      width: 68%;
+      height: 100%;
+      background: #2563eb;
+      border-radius: inherit;
+      animation: loading 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes loading {
+      from { width: 42%; }
+      to { width: 78%; }
+    }
+    .steps {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 26px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding-top: 12px;
+      border-top: 1px solid #edf2f7;
+    }
+    .step:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .mark.now {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    .step strong {
+      display: block;
+      font-size: 14px;
+      color: #172033;
+      margin-bottom: 3px;
+    }
+    .step span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    .tag {
+      color: #64748b;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .preview {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .preview strong {
+      display: block;
+      color: #7c2d12;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+    .preview p {
+      margin: 0;
+      color: #9a3412;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .skeleton {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      gap: 9px;
+    }
+    .line {
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #e2e8f0, #f8fafc, #e2e8f0);
+      background-size: 200% 100%;
+      animation: shimmer 1.3s linear infinite;
+    }
+    .line.short { width: 58%; }
+    .line.mid { width: 76%; }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <section class="header">
+      <div class="status"><span class="spinner"></span>AI 正在分析</div>
+      <h1>正在结合分数、位次、选科和兴趣生成参考方案</h1>
+      <p class="lead">预计 20-40 秒。请不要退出页面，结果将包含职业方向、专业建议和冲稳保填报思路。</p>
+    </section>
+
+    <section class="content">
+      <section class="progress-wrap">
+        <div class="progress-head">
+          <strong>分析进度</strong>
+          <span>68%</span>
+        </div>
+        <div class="progress"><div></div></div>
+      </section>
+
+      <section class="steps">
+        <div class="step">
+          <div class="mark">✓</div>
+          <div><strong>读取基础信息</strong><span>已识别省份、总分、位次、选考科目和批次线。</span></div>
+          <div class="tag">完成</div>
+        </div>
+        <div class="step">
+          <div class="mark">✓</div>
+          <div><strong>匹配职业与专业方向</strong><span>根据兴趣、MBTI、成绩层次筛选可参考方向。</span></div>
+          <div class="tag">完成</div>
+        </div>
+        <div class="step">
+          <div class="mark now">…</div>
+          <div><strong>生成志愿策略</strong><span>正在拆分冲、稳、保梯度，并提示风险点。</span></div>
+          <div class="tag">进行中</div>
+        </div>
+        <div class="step">
+          <div class="mark">4</div>
+          <div><strong>整理报告</strong><span>输出适合学生和家长共同查看的结果页。</span></div>
+          <div class="tag">等待</div>
+        </div>
+      </section>
+
+      <section class="preview">
+        <strong>结果会包含哪些内容</strong>
+        <p>推荐职业 Top 3、适配专业大类、填报策略、城市/学校/专业取舍建议、需要人工确认的风险点。</p>
+      </section>
+
+      <section class="skeleton">
+        <div class="line short"></div>
+        <div class="line"></div>
+        <div class="line mid"></div>
+        <div class="line"></div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

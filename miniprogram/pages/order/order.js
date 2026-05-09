@@ -26,7 +26,7 @@ Page({
         const orders = res.result.data.map(item => {
           return {
             ...item,
-            createTimeStr: this.formatTime(new Date(item.createTime)),
+            createTimeStr: this.formatTime(item.createTime),
             priceStr: (item.totalFee / 100).toFixed(2)
           }
         })
@@ -48,7 +48,15 @@ Page({
     }
   },
 
-  formatTime(date) {
+  formatTime(value) {
+    let source = value
+    if (value && typeof value === 'object' && value.$date) {
+      source = value.$date
+    }
+    const date = source instanceof Date ? source : new Date(source)
+    if (Number.isNaN(date.getTime())) {
+      return '--'
+    }
     const year = date.getFullYear()
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const day = date.getDate().toString().padStart(2, '0')

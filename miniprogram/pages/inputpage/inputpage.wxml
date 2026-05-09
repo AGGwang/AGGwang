@@ -1,59 +1,102 @@
-<!-- pages/inputpage/inputpage.wxml -->
-<view class="container">
-  <view class="header-guide">
-    <text class="guide-title">完善信息</text>
-    <text class="guide-desc">请提供真实的学习情况，AI 将为你定制更精准的规划</text>
+<view class="page">
+  <view class="hero compact">
+    <view class="topline">
+      <view class="badge"><view class="dot"></view><text>填写信息</text></view>
+      <text class="top-note">约 3 分钟</text>
+    </view>
+    <text class="hero-title">补齐志愿判断所需的关键信息</text>
+    <text class="hero-desc">从分数、位次、选科、MBTI、兴趣和职业路径出发，生成更可执行的职业与志愿参考。</text>
   </view>
-  <view class="form-group">
-    <view class="label">目标职业</view>
-    <input class="input" placeholder="例如：软件工程师、医生、律师" data-field="targetCareer" bindinput="onInput" />
-  </view>
-  <view class="form-group">
-    <view class="label">目标院校层次</view>
-    <picker bindchange="onCollegeLevelChange" value="{{collegeLevelIndex}}" range="{{collegeLevels}}">
-      <view class="picker-view">
-        <text wx:if="{{collegeLevel}}" class="picker-value">{{collegeLevel}}</text>
-        <text wx:else class="picker-placeholder">请选择目标院校层次</text>
-        <text class="picker-arrow">▼</text>
+
+  <view class="content">
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">高考基础信息</text>
+        <text class="hint">必填</text>
       </view>
-    </picker>
-  </view>
-  <view class="form-group">
-    <view class="label">各科分数 (7选3)</view>
-    <view class="score-grid">
-      <view class="score-item">
-        <text class="subject-name">物理</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="physics" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">化学</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="chemistry" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">生物</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="biology" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">政治</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="politics" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">历史</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="history" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">地理</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="geography" bindinput="onScoreInput" />
-      </view>
-      <view class="score-item">
-        <text class="subject-name">技术</text>
-        <input class="score-input" type="number" placeholder="分数" data-subject="technology" bindinput="onScoreInput" />
+      <view class="grid-2">
+        <view class="field half-field">
+          <text>省份</text>
+          <input class="field-input" placeholder="浙江" value="{{province}}" data-field="province" bindinput="onInput" />
+        </view>
+        <view class="field half-field">
+          <text>总分</text>
+          <input class="field-input" type="number" placeholder="586" value="{{totalScore}}" data-field="totalScore" bindinput="onInput" />
+        </view>
+        <view class="field half-field">
+          <text>全省位次</text>
+          <input class="field-input" type="number" placeholder="62000" value="{{rank}}" data-field="rank" bindinput="onInput" />
+        </view>
+        <picker class="picker-wrap half-field" mode="selector" range="{{scoreLevels}}" value="{{scoreLevelIndex}}" bindchange="onScoreLevelChange">
+          <view class="field picker-field">
+            <text>成绩层次</text>
+            <text class="{{scoreLevel ? 'field-value' : 'placeholder'}}">{{scoreLevel || '请选择'}}</text>
+          </view>
+        </picker>
       </view>
     </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">选考科目</text>
+        <text class="hint">专业限制</text>
+      </view>
+      <view class="chip-grid">
+        <block wx:for="{{subjects}}" wx:key="key">
+          <view class="chip {{item.selected ? 'active' : ''}}" data-key="{{item.key}}" catchtap="toggleSubject">
+            <text>{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+      <text class="selected-tip">已选择：{{selectedSubjectText}}</text>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="head-left">
+          <view class="test-btn" catchtap="goToMbtiTest">MBTI 测试</view>
+          <text class="section-title">性格兴趣</text>
+        </view>
+        <text class="hint">职业适配</text>
+      </view>
+      <view class="grid-2">
+        <view class="field half-field">
+          <text>MBTI</text>
+          <input class="field-input" placeholder="ENFP" value="{{mbti}}" data-field="mbti" bindinput="onInput" />
+        </view>
+        <view class="field half-field">
+          <text>兴趣</text>
+          <input class="field-input" placeholder="沟通/创意" value="{{interest}}" data-field="interest" bindinput="onInput" />
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">职业路径规划</text>
+        <text class="hint">未来去向</text>
+      </view>
+      <view class="choice-list">
+        <block wx:for="{{careerPlans}}" wx:key="value">
+          <view class="choice {{careerPlan === item.value ? 'active' : ''}}" data-value="{{item.value}}" catchtap="selectCareerPlan">
+            <view class="radio"></view>
+            <view>
+              <text class="choice-title">{{item.label}}</text>
+              <text class="choice-desc">{{item.desc}}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">个人想法</text>
+        <text class="hint">真实顾虑</text>
+      </view>
+      <textarea class="textarea" placeholder="例如：不想学太纯理工，喜欢表达和策划，希望未来就业稳定一些，家里希望优先考虑江浙沪。" value="{{personalInfo}}" data-field="personalInfo" bindinput="onInput"></textarea>
+    </view>
+
+    <button class="primary-btn" bindtap="submitForm">生成规划报告</button>
   </view>
-  <view class="form-group">
-    <view class="label">个人情况简介</view>
-    <textarea class="textarea" placeholder="请简要描述你的兴趣、擅长科目、性格特点等，帮助AI更精准分析..." data-field="personalInfo" bindinput="onInput"></textarea>
-  </view>
-  <button class="submit-btn" bindtap="submitForm">生成规划报告</button>
 </view>

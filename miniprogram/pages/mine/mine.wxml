@@ -1,79 +1,84 @@
-<!-- pages/mine/mine.wxml -->
-<view class="container">
-    <!-- 未登录状态 -->
-    <view class="login-container" wx:if="{{!isLogged}}">
-        <view class="logo-box">
-            <image class="app-logo" src="/images/home_active.png" mode="aspectFit"></image>
-            <text class="app-name">AI 选科与职业规划</text>
-        </view>
-        <button class="login-btn" bindtap="handleLogin">
-            <t-icon name="logo-wechat" size="40rpx" color="#fff" style="margin-right: 16rpx;" />
-            微信一键登录
-        </button>
-        <text class="login-tip">登录后查看历史测评记录</text>
+<view class="page footer-space">
+  <view class="hero compact">
+    <view class="topline">
+      <view class="badge"><view class="dot"></view><text>我的</text></view>
+      <text class="top-note">{{isLogged ? '登录态' : '未登录'}}</text>
     </view>
-    <!-- 已登录状态 -->
-    <block wx:else>
-        <view class="user-card">
-            <view class="avatar-box">
-                <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-                    <image wx:if="{{userInfo.avatarUrl}}" class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-                    <view wx:else class="avatar-placeholder">
-                        <t-icon name="user" size="60rpx" color="#999" />
-                    </view>
-                    <view class="camera-icon">📷</view>
-                </button>
-            </view>
-            <view class="user-info">
-                <input type="nickname" class="nickname-input" placeholder="点击输入昵称" value="{{userInfo.nickName}}" bind:change="onNicknameChange" bind:blur="onNicknameBlur" />
-                <text class="uid" bindtap="copyOpenId">ID: {{openid || '...'}} (点击复制)</text>
-                <view class="save-hint" wx:if="{{needSave}}">记得保存哦 ➡️</view>
-            </view>
-            <view class="action-box" wx:if="{{needSave}}">
-                <button class="save-btn" size="mini" bindtap="saveUserInfo">保存</button>
-            </view>
-        </view>
+    <text class="hero-title">{{isLogged ? '个人中心与历史记录' : '登录后同步报告和订单'}}</text>
+    <text class="hero-desc">{{isLogged ? '将订单、反馈、历史报告统一为学习决策档案。' : '登录后查看历史记录、订单和已解锁报告。'}}</text>
+  </view>
 
-        <!-- 功能菜单 -->
-        <view class="menu-list">
-            <view class="menu-item" bindtap="goToOrder">
-                <view class="menu-left">
-                    <t-icon name="money-circle" size="40rpx" color="#333" style="margin-right: 20rpx;" />
-                    <text class="menu-text">我的订单</text>
-                </view>
-                <t-icon name="chevron-right" size="40rpx" color="#ccc" />
-            </view>
-            <view class="divider-line"></view>
-            <view class="menu-item" bindtap="goToContact">
-                <view class="menu-left">
-                    <t-icon name="service" size="40rpx" color="#333" style="margin-right: 20rpx;" />
-                    <text class="menu-text">联系我们 / 问题反馈</text>
-                </view>
-                <t-icon name="chevron-right" size="40rpx" color="#ccc" />
-            </view>
-        </view>
+  <view class="content" wx:if="{{!isLogged}}">
+    <view class="section empty-card">
+      <view class="avatar">AI</view>
+      <text class="empty-title">AI 选科与职业规划</text>
+      <text class="empty-desc">登录后查看历史记录、订单和已解锁报告。</text>
+    </view>
+    <button class="primary-btn" bindtap="handleLogin">微信一键登录</button>
+    <view class="section warn">
+      <text class="paragraph">仅用于同步历史报告和支付订单，不会公开你的个人信息。</text>
+    </view>
+  </view>
 
-        <view class="section-title">我的测评记录</view>
-        <view class="record-list">
-            <block wx:if="{{records.length === 0}}">
-                <view class="empty-tip">暂无记录，快去首页体验吧</view>
-            </block>
-            <block wx:else>
-                <view class="record-item" wx:for="{{records}}" wx:key="_id" bindtap="goToResult" data-id="{{item._id}}">
-                    <view class="record-main">
-                        <text class="record-title">{{item.targetCareer}}</text>
-                        <text class="record-date">{{item.createTimeStr}}</text>
-                    </view>
-                    <view class="record-status">
-                        <text class="status-tag {{item.isPaid ? 'paid' : 'unpaid'}}">
-                            {{item.isPaid ? '已解锁' : '未解锁'}}
-                        </text>
-                    </view>
-                </view>
-            </block>
+  <view class="content" wx:else>
+    <view class="section user-card">
+      <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image wx:if="{{userInfo.avatarUrl}}" class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="avatar">P</view>
+      </button>
+      <view class="user-main">
+        <input type="nickname" class="nickname-input" placeholder="点击输入昵称" value="{{userInfo.nickName}}" bind:change="onNicknameChange" bind:blur="onNicknameBlur" />
+        <text class="uid" bindtap="copyOpenId">ID: {{openid || '...'}} (点击复制)</text>
+      </view>
+      <button class="orange-btn save-user-btn" wx:if="{{needSave}}" bindtap="saveUserInfo">保存</button>
+    </view>
+
+    <view class="section">
+      <view class="row-item" bindtap="goToOrder">
+        <view class="mark">¥</view>
+        <view>
+          <text class="row-title">我的订单</text>
+          <text class="row-desc">查看已支付与退款状态。</text>
         </view>
-        <view class="logout-area">
-            <text class="logout-text" bindtap="handleLogout">退出登录</text>
+        <text class="state-label">进入</text>
+      </view>
+      <view class="row-item" bindtap="goToContact">
+        <view class="mark now">?</view>
+        <view>
+          <text class="row-title">联系与反馈</text>
+          <text class="row-desc">在线客服、问题反馈、商务咨询。</text>
         </view>
-    </block>
+        <text class="state-label">进入</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">历史记录</text>
+        <text class="hint">可搜索</text>
+      </view>
+      <view class="search-row">
+        <input class="search-input" placeholder="搜索职业方向 / MBTI / 路径规划" value="{{historyKeyword}}" bindinput="onHistoryKeywordInput" bindconfirm="handleHistorySearch" />
+        <button class="search-btn" bindtap="handleHistorySearch">搜索</button>
+      </view>
+
+      <view wx:if="{{historyRecords.length === 0 && !historyLoading}}" class="empty-small">暂无历史记录</view>
+      <block wx:else>
+        <view class="row-item record" wx:for="{{historyRecords}}" wx:key="_id" bindtap="goToHistoryDetail" data-record-type="{{item.recordType}}" data-source-id="{{item.sourceId}}">
+          <view class="mark">职</view>
+          <view>
+            <text class="row-title">{{item.title}}</text>
+            <text class="row-desc">{{item.timeStr}}</text>
+          </view>
+          <text class="status {{item.isPaid ? '' : 'unpaid'}}">{{item.statusText}}</text>
+        </view>
+      </block>
+
+      <view class="list-footer" wx:if="{{historyLoading}}">加载中...</view>
+      <view class="list-footer" wx:elif="{{!historyHasMore && historyRecords.length > 0}}">没有更多了</view>
+      <button class="secondary-btn" wx:elif="{{historyHasMore && historyRecords.length > 0}}" bindtap="loadMoreHistoryRecords">加载更多</button>
+    </view>
+
+    <button class="logout-btn" bindtap="handleLogout">退出登录</button>
+  </view>
 </view>

@@ -1,0 +1,1348 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7in3 App 全页面重构风格模板</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #e7edf2;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #172033;
+      padding: 24px;
+    }
+    button, input, textarea { font: inherit; }
+    .intro {
+      width: 100%;
+      max-width: 1680px;
+      margin: 0 auto 20px;
+      background: #fff;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .intro h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      color: #13315c;
+    }
+    .intro p {
+      margin: 0;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 390px);
+      gap: 22px;
+      align-items: start;
+      min-width: max-content;
+    }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f8fafc;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 28px 62px rgba(15, 23, 42, 0.22);
+      position: relative;
+    }
+    .phone.footer-space { padding-bottom: 88px; }
+    .hero {
+      background: #13315c;
+      color: #fff;
+      padding: 28px 18px 18px;
+    }
+    .hero.compact { padding-bottom: 14px; }
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.76);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #d9f99d;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d9f99d;
+      flex: none;
+    }
+    .hero h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .content {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 13px;
+    }
+    .section.soft { background: #f8fafc; }
+    .section.warn {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+    .section.dark {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #172033;
+    }
+    .dark .title { color: #fff; }
+    .hint {
+      font-size: 12px;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .head-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .test-btn {
+      height: 26px;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .mbti-progress {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .mbti-progress span {
+      height: 7px;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .mbti-progress span.active {
+      background: #2563eb;
+    }
+    .mbti-axis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .axis-card {
+      min-height: 58px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 9px;
+      text-align: center;
+    }
+    .axis-card strong {
+      display: block;
+      color: #13315c;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .axis-card span {
+      color: #64748b;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .question-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+    .question-kicker {
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .question-text {
+      color: #172033;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 900;
+    }
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+    .scale-btn {
+      height: 40px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .scale-btn.active {
+      background: #13315c;
+      border-color: #13315c;
+      color: #fff;
+    }
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 11px;
+    }
+    .type-card {
+      background: #13315c;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .type-code {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.14);
+      color: #d9f99d;
+      font-size: 24px;
+      font-weight: 900;
+    }
+    .type-card strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .type-card span {
+      display: block;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .dimension-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .dimension {
+      display: grid;
+      grid-template-columns: 52px 1fr 42px;
+      gap: 8px;
+      align-items: center;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .dimension-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .dimension-track i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #10b981;
+    }
+    .warn .hint, .warn p { color: #9a3412; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .field {
+      min-height: 42px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 9px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .field span { color: #64748b; font-weight: 600; text-align: right; }
+    .primary {
+      width: 100%;
+      height: 52px;
+      border: 0;
+      border-radius: 8px;
+      background: #13315c;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      box-shadow: 0 12px 22px rgba(19, 49, 92, 0.24);
+    }
+    .secondary {
+      width: 100%;
+      height: 44px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #fff;
+      color: #13315c;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .orange-btn {
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #f59e0b;
+      color: #111827;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .process {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .process div {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 9px;
+      min-height: 58px;
+    }
+    .process strong {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .process span {
+      display: block;
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, 0.72);
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .feature {
+      min-height: 92px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .feature strong, .mini-card strong {
+      display: block;
+      color: #172033;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .feature span, .mini-card span, .section p {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .chip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .chip {
+      height: 36px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .chip.active {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #047857;
+    }
+    .choice-list {
+      display: grid;
+      gap: 8px;
+    }
+    .choice {
+      min-height: 48px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 9px;
+      align-items: start;
+    }
+    .radio {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+      margin-top: 2px;
+    }
+    .choice.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .choice.active .radio {
+      background: #2563eb;
+      border-color: #2563eb;
+      box-shadow: inset 0 0 0 4px #eff6ff;
+    }
+    .choice strong {
+      display: block;
+      font-size: 13px;
+      color: #172033;
+      margin-bottom: 3px;
+    }
+    .choice span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .textarea {
+      width: 100%;
+      height: 96px;
+      resize: none;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 10px;
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .progress-head span { color: #2563eb; }
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .progress div {
+      width: 68%;
+      height: 100%;
+      background: #2563eb;
+      border-radius: inherit;
+      animation: loading 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes loading {
+      from { width: 42%; }
+      to { width: 78%; }
+    }
+    .loading-step, .row-item {
+      display: grid;
+      grid-template-columns: 26px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding-top: 12px;
+      border-top: 1px solid #edf2f7;
+    }
+    .loading-step:first-child, .row-item:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+    .mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .mark.now {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    .row-item strong, .loading-step strong {
+      display: block;
+      font-size: 14px;
+      color: #172033;
+      margin-bottom: 3px;
+    }
+    .row-item span, .loading-step span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    .state-label, .pill {
+      color: #64748b;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .metric, .mini-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 72px;
+    }
+    .metric span {
+      display: block;
+      color: #64748b;
+      font-size: 11px;
+      margin-bottom: 7px;
+    }
+    .metric strong {
+      display: block;
+      color: #172033;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .career-list, .card-list, .strategy {
+      display: grid;
+      gap: 10px;
+    }
+    .verdict {
+      display: grid;
+      gap: 10px;
+    }
+    .verdict-main {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 11px;
+    }
+    .verdict-main strong {
+      display: block;
+      font-size: 15px;
+      color: #172033;
+      margin-bottom: 6px;
+    }
+    .verdict-main span {
+      display: block;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .score-list {
+      display: grid;
+      gap: 8px;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: 74px 1fr 40px;
+      gap: 8px;
+      align-items: center;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .score-track {
+      height: 7px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .score-track i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #2563eb;
+    }
+    .avoid-list {
+      display: grid;
+      gap: 8px;
+    }
+    .avoid-item {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      color: #9a3412;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .avoid-item i {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fed7aa;
+      color: #9a3412;
+      display: grid;
+      place-items: center;
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 900;
+      margin-top: 1px;
+    }
+    .job-detail {
+      display: grid;
+      gap: 8px;
+    }
+    .job-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .job-row strong {
+      color: #13315c;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .job-row span {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .income-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .income-card {
+      min-height: 74px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 10px;
+    }
+    .income-card span {
+      display: block;
+      color: #64748b;
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+    .income-card strong {
+      display: block;
+      color: #13315c;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .career-roadmap {
+      display: grid;
+      gap: 8px;
+    }
+    .roadmap-step {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 10px;
+      padding-top: 9px;
+      border-top: 1px solid #edf2f7;
+    }
+    .roadmap-step:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+    .roadmap-step strong {
+      height: 28px;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+    .roadmap-step span {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .career {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #edf2f7;
+    }
+    .career:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+    .rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #eff6ff;
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .career-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    .career-name {
+      color: #172033;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+    .match, .status {
+      flex: none;
+      color: #047857;
+      background: #ecfdf5;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .status.unpaid {
+      color: #b45309;
+      background: #fffbeb;
+    }
+    .desc {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #10b981;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .tag {
+      min-height: 27px;
+      border-radius: 999px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #d8e1ec;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .strategy-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .strategy-row strong {
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 13px;
+    }
+    .strategy-row:nth-child(1) strong { background: #2563eb; }
+    .strategy-row:nth-child(2) strong { background: #059669; }
+    .strategy-row:nth-child(3) strong { background: #d97706; }
+    .strategy-row span {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #111827;
+      color: #fff;
+      padding: 12px 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .bottom strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .bottom span {
+      display: block;
+      color: #d1d5db;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .tabbar {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 14px;
+      height: 58px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+      overflow: hidden;
+    }
+    .tab {
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .tab.active {
+      color: #13315c;
+      background: #eff6ff;
+    }
+    .avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #eff6ff;
+      border: 1px solid #d8e1ec;
+      display: grid;
+      place-items: center;
+      color: #13315c;
+      font-size: 24px;
+      font-weight: 900;
+    }
+    .user {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .price {
+      color: #dc2626;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .empty {
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .log-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #475569;
+      font-size: 13px;
+      padding: 10px 0;
+      border-top: 1px solid #edf2f7;
+    }
+    .log-line:first-child { border-top: 0; padding-top: 0; }
+  </style>
+</head>
+<body>
+  <section class="intro">
+    <h1>7in3 App 全页面重构风格模板</h1>
+    <p>统一为“高考后决策助手”视觉：深蓝头部、白底信息卡、8px 圆角、清晰的冲稳保/解锁/咨询转化结构。下方包含精简后的首页、职业与志愿分析、我的、订单、联系反馈、日志和底栏状态。</p>
+  </section>
+
+  <div class="board">
+    <main class="phone footer-space">
+      <section class="hero">
+        <div class="topline">
+          <span class="badge"><i class="dot"></i>高考后决策助手</span>
+          <span>首页</span>
+        </div>
+        <h2>AI 辅助职业选择与志愿填报参考</h2>
+        <p class="lead">把分数、位次、选科、兴趣和性格转成更清晰的专业与职业方向。</p>
+        <div class="process">
+          <div><strong>01 输入</strong><span>成绩、位次、选科、偏好</span></div>
+          <div><strong>02 分析</strong><span>职业、专业、院校取舍</span></div>
+          <div><strong>03 复核</strong><span>解锁报告或老师咨询</span></div>
+        </div>
+      </section>
+      <section class="content">
+        <button class="primary">开始职业与志愿分析</button>
+        <section class="section">
+          <div class="section-head"><div class="title">功能入口</div><div class="hint">可保留或精简</div></div>
+          <div class="feature-grid">
+            <div class="feature"><strong>职业与志愿分析</strong><span>成绩、位次、兴趣、MBTI 与职业路径规划综合分析。</span></div>
+            <div class="feature"><strong>专业方向建议</strong><span>结合选科限制与就业方向，筛出适合的大类。</span></div>
+            <div class="feature"><strong>老师复核咨询</strong><span>复杂志愿表可添加老师 VX 继续判断风险。</span></div>
+            <div class="feature"><strong>历史记录</strong><span>登录后查看报告、订单和解锁状态。</span></div>
+          </div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">定位说明</div><div class="hint">首屏文案</div></div>
+          <p>结果用于职业选择与志愿填报参考，不替代官方招生计划、位次表和专业组规则。</p>
+        </section>
+      </section>
+      <nav class="tabbar"><div class="tab active">首页</div><div class="tab">我的</div></nav>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>填写信息</span><span>职业规划</span></div>
+        <h2>补齐志愿判断所需的关键信息</h2>
+        <p class="lead">从“目标职业”升级为“高考后可行路径”：先看分数、位次、选科，再结合个人想法。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="section-head"><div class="title">高考基础信息</div><div class="hint">必填</div></div>
+          <div class="grid-2">
+            <div class="field">省份 <span>浙江</span></div>
+            <div class="field">总分 <span>586</span></div>
+            <div class="field">全省位次 <span>6.2 万</span></div>
+            <div class="field">成绩层次 <span>特殊线附近</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">选考科目</div><div class="hint">专业限制</div></div>
+          <div class="chip-grid">
+            <button class="chip active">物理</button><button class="chip active">化学</button><button class="chip">生物</button><button class="chip">政治</button>
+            <button class="chip active">历史</button><button class="chip">地理</button><button class="chip">技术</button><button class="chip">未定</button>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head">
+            <div class="head-left"><button class="test-btn">MBTI 测试</button><div class="title">性格兴趣</div></div>
+            <div class="hint">职业适配</div>
+          </div>
+          <div class="grid-2">
+            <div class="field">MBTI <span>ENFP</span></div>
+            <div class="field">兴趣 <span>沟通/创意</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">职业路径规划</div><div class="hint">未来去向</div></div>
+          <div class="choice-list">
+            <div class="choice active"><span class="radio"></span><div><strong>本科就业</strong><span>希望大学阶段尽早积累实习和作品，毕业后直接工作</span></div></div>
+            <div class="choice"><span class="radio"></span><div><strong>考研深造</strong><span>接受长期学习投入，希望通过研究生阶段提升学校或专业层次</span></div></div>
+            <div class="choice"><span class="radio"></span><div><strong>考公考编</strong><span>更重视稳定性，专业选择需兼顾岗位限制和竞争强度</span></div></div>
+            <div class="choice"><span class="radio"></span><div><strong>出国留学</strong><span>考虑海外升学或就业，需关注专业国际认可度与成本</span></div></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">个人想法</div><div class="hint">真实顾虑</div></div>
+          <textarea class="textarea" placeholder="例如：不想学太纯理工，喜欢表达和策划，希望未来就业稳定一些。"></textarea>
+        </section>
+        <button class="primary">生成规划报告</button>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>MBTI 测试</span><span>答题中</span></div>
+        <h2>用 16 道轻量题判断你的性格倾向</h2>
+        <p class="lead">测试结果只作为职业适配参考，会自动回填到填写页的 MBTI 字段。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="section-head"><div class="title">测试进度</div><div class="hint">第 7 / 16 题</div></div>
+          <div class="mbti-progress">
+            <span class="active"></span><span class="active"></span><span></span><span></span>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">正在判断的维度</div><div class="hint">E / I</div></div>
+          <div class="mbti-axis">
+            <div class="axis-card"><strong>E</strong><span>外向能量</span></div>
+            <div class="axis-card"><strong>I</strong><span>内向能量</span></div>
+            <div class="axis-card"><strong>N</strong><span>抽象直觉</span></div>
+            <div class="axis-card"><strong>S</strong><span>现实细节</span></div>
+          </div>
+        </section>
+        <section class="question-card">
+          <div class="question-kicker">情境题 07</div>
+          <div class="question-text">当你面对一个完全陌生的专业方向时，更倾向于先和别人讨论，再形成自己的判断。</div>
+          <div class="scale">
+            <button class="scale-btn">很不同意</button>
+            <button class="scale-btn">不同意</button>
+            <button class="scale-btn active">中立</button>
+            <button class="scale-btn">同意</button>
+            <button class="scale-btn">很同意</button>
+          </div>
+          <div class="scale-labels"><span>更偏独立思考</span><span>更偏外部交流</span></div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">测试说明</div><div class="hint">非诊断</div></div>
+          <p>MBTI 不能决定专业选择，只用于辅助理解沟通方式、决策偏好和学习动力来源。</p>
+        </section>
+        <div class="grid-2">
+          <button class="secondary">上一题</button>
+          <button class="primary">下一题</button>
+        </div>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>MBTI 结果</span><span>可回填</span></div>
+        <h2>你的测试结果偏向 ENFP</h2>
+        <p class="lead">结果会作为职业与志愿分析的一项参考，不会替代分数、位次和选科限制。</p>
+      </section>
+      <section class="content">
+        <section class="type-card">
+          <div class="type-code">ENFP</div>
+          <div>
+            <strong>创意表达型探索者</strong>
+            <span>通常重视兴趣、意义感和成长空间，适合需要表达、连接、创新和跨领域理解的方向。</span>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">维度倾向</div><div class="hint">测试估算</div></div>
+          <div class="dimension-grid">
+            <div class="dimension"><span>E 外向</span><div class="dimension-track"><i style="width:72%"></i></div><span>72</span></div>
+            <div class="dimension"><span>N 直觉</span><div class="dimension-track"><i style="width:81%"></i></div><span>81</span></div>
+            <div class="dimension"><span>F 情感</span><div class="dimension-track"><i style="width:67%"></i></div><span>67</span></div>
+            <div class="dimension"><span>P 探索</span><div class="dimension-track"><i style="width:76%"></i></div><span>76</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">对志愿分析的影响</div><div class="hint">自动带入</div></div>
+          <div class="row-item"><div class="mark">优</div><div><strong>适合方向</strong><span>产品策划、用户研究、传播、教育科技、内容运营等跨学科路径。</span></div><div class="state-label">参考</div></div>
+          <div class="row-item"><div class="mark now">慎</div><div><strong>需要留意</strong><span>如果选择高度重复、反馈周期很长的专业，可能动力不足。</span></div><div class="state-label">复核</div></div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">下一步</div><div class="hint">回填表单</div></div>
+          <p>建议把 ENFP 回填到填写页，同时补充真实兴趣、分数位次和家庭偏好，避免只凭性格类型做决定。</p>
+        </section>
+        <button class="primary">使用 ENFP 并返回填写页</button>
+        <button class="secondary">重新测试</button>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>AI 正在分析</span><span>生成中</span></div>
+        <h2>正在生成职业与志愿填报参考方案</h2>
+        <p class="lead">加载页用进度、步骤和结果预告降低等待焦虑。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="progress-head"><strong>分析进度</strong><span>68%</span></div>
+          <div class="progress"><div></div></div>
+        </section>
+        <section class="section">
+          <div class="loading-step"><div class="mark">✓</div><div><strong>读取基础信息</strong><span>省份、总分、位次、选考科目。</span></div><div class="state-label">完成</div></div>
+          <div class="loading-step"><div class="mark">✓</div><div><strong>匹配职业与专业</strong><span>结合兴趣、MBTI 和成绩层次。</span></div><div class="state-label">完成</div></div>
+          <div class="loading-step"><div class="mark now">…</div><div><strong>生成志愿策略</strong><span>拆分冲、稳、保梯度和风险点。</span></div><div class="state-label">进行中</div></div>
+          <div class="loading-step"><div class="mark">4</div><div><strong>整理报告</strong><span>输出适合学生和家长共同查看的结果。</span></div><div class="state-label">等待</div></div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">结果预告</div><div class="hint">即将生成</div></div>
+          <p>推荐职业 Top 3、适配专业大类、冲稳保策略、成长路径、需要老师复核的风险点。</p>
+        </section>
+      </section>
+    </main>
+
+    <main class="phone footer-space">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>报告已生成</span><span>职业结果</span></div>
+        <h2>职业选择与志愿填报参考方案</h2>
+        <p class="lead">把 AI 长文本拆成学生和家长能快速决策的模块：先看结论，再看依据，最后看风险。</p>
+      </section>
+      <section class="content">
+        <div class="summary">
+          <div class="metric"><span>成绩层次</span><strong>特殊线附近</strong></div>
+          <div class="metric"><span>路径规划</span><strong>本科就业</strong></div>
+          <div class="metric"><span>性格兴趣</span><strong>沟通创意</strong></div>
+        </div>
+        <section class="section">
+          <div class="section-head"><div class="title">核心结论</div><div class="hint">先看这块</div></div>
+          <div class="verdict">
+            <div class="verdict-main">
+              <strong>建议走“技术理解 + 内容表达 + 用户洞察”的复合路线</strong>
+              <span>当前分数和选科具备一定理工入口，但个人偏好更偏沟通、策划和创意，不建议只按热门专业盲冲纯工科。</span>
+            </div>
+            <div class="score-list">
+              <div class="score-row"><span>专业适配</span><div class="score-track"><i style="width:88%"></i></div><span>88</span></div>
+              <div class="score-row"><span>录取可行</span><div class="score-track"><i style="width:74%"></i></div><span>74</span></div>
+              <div class="score-row"><span>就业延展</span><div class="score-track"><i style="width:83%"></i></div><span>83</span></div>
+            </div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">推荐职业方向</div><div class="hint">Top 3</div></div>
+          <div class="career-list">
+            <div class="career"><div class="rank">1</div><div><div class="career-top"><div class="career-name">产品策划与用户研究</div><div class="match">91%</div></div><div class="desc">适合把用户需求、数据和产品体验串起来，建议用计算机/管理/传播交叉专业进入。</div><div class="bar"><i style="width:91%"></i></div></div></div>
+            <div class="career"><div class="rank">2</div><div><div class="career-top"><div class="career-name">数字媒体与内容运营</div><div class="match">86%</div></div><div class="desc">适合表达、审美和热点敏感度较强的学生，后续需补数据分析和商业理解。</div><div class="bar"><i style="width:86%"></i></div></div></div>
+            <div class="career"><div class="rank">3</div><div><div class="career-top"><div class="career-name">教育科技与生涯规划</div><div class="match">82%</div></div><div class="desc">适合愿意长期与人沟通并帮助他人的学生，可从教育技术、心理、产品运营切入。</div><div class="bar"><i style="width:82%"></i></div></div></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">适配专业大类</div><div class="hint">结合选科</div></div>
+          <div class="tags"><span class="tag">计算机类</span><span class="tag">数字媒体技术</span><span class="tag">新闻传播</span><span class="tag">工商管理</span><span class="tag">心理学</span><span class="tag">教育技术学</span></div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">具体工作内容</div><div class="hint">以产品策划为例</div></div>
+          <div class="job-detail">
+            <div class="job-row"><strong>日常任务</strong><span>收集用户需求、分析竞品、整理产品方案、协调设计和研发推进功能上线。</span></div>
+            <div class="job-row"><strong>核心能力</strong><span>沟通表达、逻辑拆解、数据判断、文档写作和跨团队协作。</span></div>
+            <div class="job-row"><strong>适合原因</strong><span>该方向能同时用到理工理解力和创意表达力，比纯技术岗更贴合当前画像。</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">职业收入估计</div><div class="hint">城市差异较大</div></div>
+          <div class="income-grid">
+            <div class="income-card"><span>毕业 1-3 年</span><strong>8k-15k/月</strong></div>
+            <div class="income-card"><span>毕业 3-5 年</span><strong>15k-28k/月</strong></div>
+            <div class="income-card"><span>成熟阶段</span><strong>30k+/月</strong></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">后续职业发展规划</div><div class="hint">本科就业路径</div></div>
+          <div class="career-roadmap">
+            <div class="roadmap-step"><strong>暑假</strong><span>完成 2 门产品/数据公开课，访谈 3 位相关专业学长学姐，确认专业黑名单。</span></div>
+            <div class="roadmap-step"><strong>大一</strong><span>补基础编程、数据分析和表达写作，加入产品、传媒或创业类社团。</span></div>
+            <div class="roadmap-step"><strong>大二</strong><span>做 1-2 个可展示项目，积累竞赛、调研报告或产品原型作品。</span></div>
+            <div class="roadmap-step"><strong>大三</strong><span>争取产品运营、用户研究或内容策略实习，用真实岗位验证适配度。</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">志愿填报策略</div><div class="hint">冲稳保</div></div>
+          <div class="strategy">
+            <div class="strategy-row"><strong>冲</strong><span>选择更高层次学校或热门城市，专业接受相近方向。</span></div>
+            <div class="strategy-row"><strong>稳</strong><span>围绕数字媒体、传播、教育技术做主填报区间。</span></div>
+            <div class="strategy-row"><strong>保</strong><span>保留就业路径明确、转专业空间较大的组合。</span></div>
+          </div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">不建议优先选择</div><div class="hint">需谨慎</div></div>
+          <div class="avoid-list">
+            <div class="avoid-item"><i>!</i><span>只因热门而选择强工科专业，若数学和编程投入意愿不足，后续压力会偏大。</span></div>
+            <div class="avoid-item"><i>!</i><span>只看学校层次忽略专业组，可能进入与兴趣差异较大的方向。</span></div>
+          </div>
+        </section>
+      </section>
+      <section class="bottom"><div><strong>解锁完整报告</strong><span>查看 3000 字+ 路径与专业组风险分析。</span></div><button class="orange-btn">¥5.99 解锁</button></section>
+    </main>
+
+    <main class="phone footer-space">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>专人咨询</span><span>已解锁</span></div>
+        <h2>完整报告与老师咨询入口</h2>
+        <p class="lead">付费后弱化遮罩，强化“老师复核志愿表”的下一步行动。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="section-head"><div class="title">详细学习路径</div><div class="hint">已解锁</div></div>
+          <div class="row-item"><div class="mark">1</div><div><strong>暑假</strong><span>完成专业访谈、公开课体验和志愿表初筛。</span></div><div class="state-label">立即做</div></div>
+          <div class="row-item"><div class="mark">2</div><div><strong>大一</strong><span>补数据分析、写作表达、基础编程能力。</span></div><div class="state-label">入学后</div></div>
+          <div class="row-item"><div class="mark">3</div><div><strong>大二</strong><span>用实习、竞赛和作品集验证职业适配度。</span></div><div class="state-label">验证</div></div>
+        </section>
+        <section class="section warn">
+          <div class="section-head"><div class="title">需要人工复核</div><div class="hint">风险点</div></div>
+          <p>院校专业组、招生计划、选科要求和位次波动需要按当年官方数据复核。</p>
+        </section>
+        <section class="section dark">
+          <div class="section-head"><div class="title">老师 VX 咨询</div><div class="hint">可复制</div></div>
+          <p style="color:#d1d5db">复杂个案可添加老师继续看院校组合、专业组风险和保底方案。</p>
+        </section>
+      </section>
+      <section class="bottom"><div><strong>需要老师复核志愿表？</strong><span>复制老师 VX，继续一对一咨询。</span></div><button class="orange-btn">复制 VX</button></section>
+    </main>
+
+    <main class="phone footer-space">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>我的</span><span>登录态</span></div>
+        <h2>个人中心与历史记录</h2>
+        <p class="lead">将登录、订单、反馈、历史报告统一为“学习决策档案”。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="user">
+            <div class="avatar">P</div>
+            <div><div class="title">Paul 同学</div><p>ID: oAbc...2026</p></div>
+            <button class="orange-btn">保存</button>
+          </div>
+        </section>
+        <section class="section">
+          <div class="row-item"><div class="mark">¥</div><div><strong>我的订单</strong><span>查看已支付与退款状态。</span></div><div class="state-label">进入</div></div>
+          <div class="row-item"><div class="mark now">?</div><div><strong>联系与反馈</strong><span>在线客服、问题反馈、商务咨询。</span></div><div class="state-label">进入</div></div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="title">历史记录</div><div class="hint">可搜索</div></div>
+          <div class="field">搜索 <span>职业方向 / 功能名 / 订单号</span></div>
+          <div style="height:10px"></div>
+          <div class="row-item"><div class="mark">职</div><div><strong>职业与志愿分析</strong><span>2026-05-09 15:20</span></div><div class="status">已支付</div></div>
+          <div class="row-item"><div class="mark">报</div><div><strong>志愿策略复核记录</strong><span>订单号：202605091230</span></div><div class="status unpaid">未解锁</div></div>
+        </section>
+      </section>
+      <nav class="tabbar"><div class="tab">首页</div><div class="tab active">我的</div></nav>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>我的</span><span>未登录</span></div>
+        <h2>登录后同步报告和订单</h2>
+        <p class="lead">未登录页保持简单：说明价值、微信登录、隐私提示。</p>
+      </section>
+      <section class="content">
+        <section class="section" style="min-height:260px;display:grid;place-items:center;text-align:center">
+          <div>
+            <div class="avatar" style="margin:0 auto 14px">AI</div>
+            <div class="title">AI 选科与职业规划</div>
+            <p style="margin-top:8px">登录后查看历史记录、订单和已解锁报告。</p>
+          </div>
+        </section>
+        <button class="primary">微信一键登录</button>
+        <section class="section warn"><p>仅用于同步历史报告和支付订单，不会公开你的个人信息。</p></section>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>订单</span><span>支付记录</span></div>
+        <h2>我的订单</h2>
+        <p class="lead">用卡片区分商品、金额、状态和“查看报告”动作。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="row-item"><div class="mark">1</div><div><strong>职业规划报告解锁</strong><span>订单号：202605091256001</span></div><div class="status">已支付</div></div>
+          <div class="strategy-row"><strong>¥</strong><span><b class="price">5.99</b><br>2026-05-09 15:26，可点击查看报告。</span></div>
+          <button class="secondary">查看报告</button>
+        </section>
+        <section class="section">
+          <div class="row-item"><div class="mark">2</div><div><strong>老师志愿表复核</strong><span>订单号：202605091318882</span></div><div class="status">已支付</div></div>
+          <div class="strategy-row"><strong>¥</strong><span><b class="price">19.90</b><br>已同步到历史记录。</span></div>
+          <button class="secondary">查看复核记录</button>
+        </section>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>联系反馈</span><span>客服</span></div>
+        <h2>联系与反馈</h2>
+        <p class="lead">保留在线客服、反馈和邮箱咨询，文案更贴合志愿填报场景。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="row-item"><div class="mark">客</div><div><strong>在线客服</strong><span>工作日 9:00-18:00，处理登录、支付和报告问题。</span></div><div class="state-label">进入</div></div>
+          <div class="row-item"><div class="mark now">反</div><div><strong>意见反馈 / 问题上报</strong><span>报告内容异常、生成失败、页面问题。</span></div><div class="state-label">进入</div></div>
+          <div class="row-item"><div class="mark">邮</div><div><strong>商务咨询</strong><span>paul7in3wechat@outlook.com</span></div><div class="state-label">复制</div></div>
+        </section>
+        <section class="section warn"><p>涉及具体志愿表复核，请优先添加老师 VX 或提供完整分数、位次、省份和选科信息。</p></section>
+      </section>
+    </main>
+
+    <main class="phone">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>日志</span><span>调试页</span></div>
+        <h2>访问与操作日志</h2>
+        <p class="lead">开发调试页也统一风格，方便后续决定是否隐藏或改成系统消息。</p>
+      </section>
+      <section class="content">
+        <section class="section">
+          <div class="section-head"><div class="title">最近日志</div><div class="hint">仅调试</div></div>
+          <div class="log-line"><span>1. 进入首页</span><strong>15:20:31</strong></div>
+          <div class="log-line"><span>2. 提交职业分析</span><strong>15:21:08</strong></div>
+          <div class="log-line"><span>3. AI 生成完成</span><strong>15:21:42</strong></div>
+          <div class="log-line"><span>4. 打开结果页</span><strong>15:22:10</strong></div>
+        </section>
+        <section class="section warn"><p>正式版可移除日志页，或改成“系统消息 / 生成记录”。</p></section>
+      </section>
+    </main>
+
+    <main class="phone footer-space">
+      <section class="hero compact">
+        <div class="topline"><span class="badge"><i class="dot"></i>空状态</span><span>通用</span></div>
+        <h2>空列表与加载失败状态</h2>
+        <p class="lead">订单、历史记录、院校列表都需要统一空状态和重试按钮。</p>
+      </section>
+      <section class="content">
+        <section class="section empty">
+          <div>
+            <div class="avatar" style="margin:0 auto 14px">空</div>
+            <strong>暂无历史记录</strong><br>
+            <span>生成第一份职业与志愿参考报告后，会自动同步到这里。</span>
+          </div>
+        </section>
+        <button class="primary">去生成报告</button>
+        <button class="secondary">重新加载</button>
+      </section>
+      <nav class="tabbar"><div class="tab">首页</div><div class="tab active">我的</div></nav>
+    </main>
+  </div>
+</body>
+</html>

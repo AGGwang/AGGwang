@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高考志愿职业参考 - 结果页</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e7edf2;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #172033;
+    }
+    button { font: inherit; }
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f8fafc;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 28px 62px rgba(15, 23, 42, 0.22);
+      position: relative;
+      padding-bottom: 88px;
+    }
+    .header {
+      background: #13315c;
+      color: #fff;
+      padding: 28px 18px 18px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #d9f99d;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .content {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .metric {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 72px;
+    }
+    .metric span {
+      display: block;
+      color: #64748b;
+      font-size: 11px;
+      margin-bottom: 7px;
+    }
+    .metric strong {
+      display: block;
+      color: #172033;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 13px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #172033;
+    }
+    .note {
+      font-size: 12px;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .career-list {
+      display: grid;
+      gap: 10px;
+    }
+    .career {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #edf2f7;
+    }
+    .career:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #eff6ff;
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .career-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    .career-name {
+      color: #172033;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+    .match {
+      flex: none;
+      color: #047857;
+      background: #ecfdf5;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .desc {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #10b981;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .tag {
+      min-height: 27px;
+      border-radius: 999px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #d8e1ec;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .strategy {
+      display: grid;
+      gap: 8px;
+    }
+    .strategy-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .strategy-row strong {
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 13px;
+    }
+    .strategy-row:nth-child(1) strong { background: #2563eb; }
+    .strategy-row:nth-child(2) strong { background: #059669; }
+    .strategy-row:nth-child(3) strong { background: #d97706; }
+    .strategy-row span {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .path {
+      display: grid;
+      gap: 8px;
+    }
+    .path-row {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 10px;
+      padding-top: 9px;
+      border-top: 1px solid #edf2f7;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .path-row:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .path-row strong {
+      color: #13315c;
+    }
+    .risk {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+    .risk p {
+      margin: 0;
+      color: #9a3412;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #111827;
+      color: #fff;
+      padding: 12px 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .bottom strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .bottom span {
+      display: block;
+      color: #d1d5db;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .button {
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #f59e0b;
+      color: #111827;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <section class="header">
+      <div class="status">AI 报告已生成</div>
+      <h1>职业选择与志愿填报参考方案</h1>
+      <p class="lead">基于浙江、586 分、物化史、ENFP、专业优先偏好生成，供学生和家长共同讨论。</p>
+    </section>
+
+    <section class="content">
+      <div class="summary">
+        <div class="metric"><span>成绩层次</span><strong>特殊线附近</strong></div>
+        <div class="metric"><span>填报偏好</span><strong>专业优先</strong></div>
+        <div class="metric"><span>性格兴趣</span><strong>沟通创意</strong></div>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="title">推荐职业方向</div>
+          <div class="note">不是最终结论</div>
+        </div>
+        <div class="career-list">
+          <div class="career">
+            <div class="rank">1</div>
+            <div>
+              <div class="career-top"><div class="career-name">产品策划与用户研究</div><div class="match">91%</div></div>
+              <div class="desc">匹配沟通表达、创意策划和物化背景，适合从管理、传播、计算机交叉方向进入。</div>
+              <div class="bar"><i style="width: 91%;"></i></div>
+            </div>
+          </div>
+          <div class="career">
+            <div class="rank">2</div>
+            <div>
+              <div class="career-top"><div class="career-name">数字媒体与内容运营</div><div class="match">86%</div></div>
+              <div class="desc">适合表达、审美、热点敏感度较强的学生，可结合数据分析能力提升竞争力。</div>
+              <div class="bar"><i style="width: 86%;"></i></div>
+            </div>
+          </div>
+          <div class="career">
+            <div class="rank">3</div>
+            <div>
+              <div class="career-top"><div class="career-name">教育科技与生涯规划</div><div class="match">82%</div></div>
+              <div class="desc">适合愿意长期与人沟通并帮助他人的学生，后续可往教育产品、咨询、规划方向发展。</div>
+              <div class="bar"><i style="width: 82%;"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="title">适配专业大类</div>
+          <div class="note">结合选科限制</div>
+        </div>
+        <div class="tags">
+          <span class="tag">计算机类</span>
+          <span class="tag">数字媒体技术</span>
+          <span class="tag">新闻传播</span>
+          <span class="tag">工商管理</span>
+          <span class="tag">心理学</span>
+          <span class="tag">教育技术学</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="title">志愿填报策略</div>
+          <div class="note">冲稳保参考</div>
+        </div>
+        <div class="strategy">
+          <div class="strategy-row"><strong>冲</strong><span>选择 2-3 个更高层次学校或热门城市，但专业要接受相近方向。</span></div>
+          <div class="strategy-row"><strong>稳</strong><span>围绕数字媒体、管理科学、传播和教育技术做主填报区间。</span></div>
+          <div class="strategy-row"><strong>保</strong><span>保留就业路径明确、转专业或辅修空间较大的院校专业组合。</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="title">可行成长路径</div>
+          <div class="note">入学前后执行</div>
+        </div>
+        <div class="path">
+          <div class="path-row"><strong>暑假</strong><span>完成专业访谈 3 次，体验产品、运营、传播相关公开课或项目。</span></div>
+          <div class="path-row"><strong>大一</strong><span>优先补数据分析、写作表达、基础编程能力，确认主方向。</span></div>
+          <div class="path-row"><strong>大二以后</strong><span>用实习、竞赛和作品集验证职业适配度，避免只靠专业名称判断。</span></div>
+        </div>
+      </section>
+
+      <section class="section risk">
+        <div class="section-head">
+          <div class="title">风险提醒</div>
+          <div class="note">建议人工复核</div>
+        </div>
+        <p>本结果不能替代正式志愿填报。具体院校专业组、招生计划、选科要求和位次波动必须按当年官方数据复核；若家庭对城市、学费或就业稳定性有强约束，建议进一步咨询老师。</p>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <div>
+        <strong>需要老师复核志愿表？</strong>
+        <span>复制老师 VX，进一步看院校和专业组合。</span>
+      </div>
+      <button class="button">复制 VX</button>
+    </section>
+  </main>
+</body>
+</html>

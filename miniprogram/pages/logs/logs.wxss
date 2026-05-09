@@ -1,16 +1,124 @@
-page {
-  height: 100vh;
+.page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.hero {
+  background: #13315c;
+  color: #fff;
+  padding: 56rpx 36rpx 28rpx;
+}
+
+.topline {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
 }
-.scrollarea {
-  flex: 1;
-  overflow-y: hidden;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 14rpx;
+  min-height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.14);
+  color: #d9f99d;
+  font-size: 24rpx;
+  font-weight: 800;
 }
-.log-item {
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #d9f99d;
+}
+
+.top-note {
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 24rpx;
+}
+
+.hero-title {
+  display: block;
+  font-size: 52rpx;
+  line-height: 1.24;
+  font-weight: 800;
+}
+
+.hero-desc {
+  display: block;
   margin-top: 20rpx;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 28rpx;
+  line-height: 1.7;
 }
-.log-item:last-child {
-  padding-bottom: env(safe-area-inset-bottom);
+
+.content {
+  padding: 28rpx;
+  display: grid;
+  gap: 20rpx;
+}
+
+.section {
+  background: #fff;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 16rpx;
+  padding: 26rpx;
+}
+
+.warn {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  color: #172033;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.hint {
+  color: #64748b;
+  font-size: 24rpx;
+}
+
+.log-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  color: #475569;
+  font-size: 26rpx;
+  padding: 20rpx 0;
+  border-top: 1rpx solid #edf2f7;
+}
+
+.log-line:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.paragraph,
+.empty-small {
+  display: block;
+  color: #9a3412;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.empty-small {
+  color: #64748b;
+  text-align: center;
+  padding: 40rpx 0 10rpx;
 }

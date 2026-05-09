@@ -12,10 +12,8 @@
 
 // 支付配置
 const PAY_CONFIG = {
-  // 报告解锁价格（单位：分，100 = 1元）
   reportPrice: 599,
-  // 商品描述
-  description: '7选3测评报告解锁'
+  description: '职业与志愿分析报告解锁'
 }
 
 /**
@@ -37,37 +35,33 @@ function generateOutTradeNo(recordId) {
  * @param {string} recordId - 记录ID
  * @returns {Promise<{success: boolean, mock?: boolean, errMsg?: string}>}
  */
-export async function requestPayment(recordId) {
+export async function requestPayment(recordId, options = {}) {
   try {
-    // 生成商户订单号
     const outTradeNo = generateOutTradeNo(recordId)
+    const totalFee = Number(options.totalFee || PAY_CONFIG.reportPrice)
+    const description = options.description || PAY_CONFIG.description
+    const attachData = options.attach || { recordId }
+    const bizType = options.bizType || 'report_unlock'
 
     wx.showLoading({ title: '正在创建订单...' })
 
     console.log('[支付] 调用 wxpayFunctions 下单', {
       outTradeNo,
-      totalFee: PAY_CONFIG.reportPrice,
-      description: PAY_CONFIG.description
+      totalFee,
+      description
     })
 
-    // 调用官方支付模板的云函数
-    // 参数格式参考官方文档：https://docs.cloudbase.net/lowcode/practices/miniapp-guide/wx-pay
     const res = await wx.cloud.callFunction({
       name: 'wxpayFunctions',
       data: {
-        // 调用下单方法
         type: 'wxpay_order',
-        // 商户订单号（必填）
         out_trade_no: outTradeNo,
-        // 订单金额（必填，单位：分）
         amount: {
-          total: PAY_CONFIG.reportPrice,
+          total: totalFee,
           currency: 'CNY'
         },
-        // 商品描述（必填）
-        description: PAY_CONFIG.description,
-        // 附加数据（可选，用于回调时识别订单）
-        attach: JSON.stringify({ recordId: recordId })
+        description: description,
+        attach: JSON.stringify(attachData)
       }
     })
 
@@ -75,23 +69,18 @@ export async function requestPayment(recordId) {
 
     console.log('[支付] 下单结果:', JSON.stringify(res))
 
-    // 检查返回结果
     if (!res.result) {
       console.error('[支付] 云函数返回为空:', res)
       throw new Error('云函数返回结果为空')
     }
 
-    // 官方模板返回格式：{ errCode: 0, errMsg: 'ok', data: {...} }
     if (res.result.errCode !== 0 && res.result.code !== 0) {
       console.error('[支付] 云函数返回错误:', res.result)
       throw new Error(res.result.errMsg || res.result.msg || '创建订单失败')
     }
 
-    // 获取支付参数
-    // 兼容不同的返回结构，有些模板可能将参数放在 payment 字段下
     const paymentData = res.result.data || res.result.payment || res.result
 
-    // 检查关键参数：package 或 packageVal
     if (!paymentData || (!paymentData.package && !paymentData.packageVal)) {
       console.error('[支付] 参数异常，完整返回:', JSON.stringify(res))
       throw new Error('支付参数缺失(package/packageVal)')
@@ -99,11 +88,9 @@ export async function requestPayment(recordId) {
 
     console.log('[支付] 支付参数:', JSON.stringify(paymentData))
 
-    // 调用微信支付API
     await wx.requestPayment({
       timeStamp: paymentData.timeStamp,
       nonceStr: paymentData.nonceStr,
-      // 兼容 packageVal 和 package 字段
       package: paymentData.package || paymentData.packageVal,
       signType: paymentData.signType || 'RSA',
       paySign: paymentData.paySign
@@ -115,7 +102,9 @@ export async function requestPayment(recordId) {
     await saveOrderToDatabase({
       recordId,
       outTradeNo,
-      totalFee: PAY_CONFIG.reportPrice,
+      totalFee,
+      description,
+      bizType,
       status: 'SUCCESS'
     })
 
@@ -130,7 +119,6 @@ export async function requestPayment(recordId) {
     console.error('[支付] 支付失败:', err)
     wx.hideLoading()
 
-    // 处理用户取消支付
     if (err.errMsg && err.errMsg.includes('cancel')) {
       return {
         success: false,
@@ -139,7 +127,6 @@ export async function requestPayment(recordId) {
       }
     }
 
-    // 其他错误
     return {
       success: false,
       errMsg: err.message || err.errMsg || '支付失败，请重试'
@@ -262,41 +249,53 @@ export async function requestRefund(outTradeNo, refundFee, reason = '用户申�
  * @returns {Promise<{success: boolean, mock?: boolean, errMsg?: string}>}
  */
 export async function payAndWaitResult(recordId) {
-  // 发起支付
-  const payResult = await requestPayment(recordId)
+  return payAndUnlock(recordId, {
+    totalFee: PAY_CONFIG.reportPrice,
+    description: PAY_CONFIG.description,
+    unlockFunctionName: 'unlock_record',
+    unlockData: { recordId },
+    successMessage: '支付成功，报告已解锁',
+    loadingText: '正在解锁报告...'
+  })
+}
 
+export async function payAndUnlock(recordId, options = {}) {
+  const payResult = await requestPayment(recordId, options)
   if (!payResult.success) {
     return payResult
   }
 
-  // 真实支付成功，解锁报告
-  wx.showLoading({ title: '正在解锁报告...' })
+  const unlockFunctionName = options.unlockFunctionName || 'unlock_record'
+  const unlockData = options.unlockData || { recordId }
+  const successMessage = options.successMessage || '支付成功，内容已解锁'
+  const loadingText = options.loadingText || '正在解锁内容...'
+
+  wx.showLoading({ title: loadingText })
 
   try {
+    const mergedUnlockData = {
+      ...unlockData,
+      outTradeNo: payResult.outTradeNo
+    }
     const unlockRes = await wx.cloud.callFunction({
-      name: 'unlock_record',
-      data: { recordId }
+      name: unlockFunctionName,
+      data: mergedUnlockData
     })
-
     wx.hideLoading()
-
-    if (unlockRes.result.success) {
-      return {
-        success: true,
-        message: '支付成功，报告已解锁'
-      }
-    } else {
-      // 支付成功但解锁失败，需要人工处理
-      return {
-        success: true,
-        message: '支付成功，报告解锁中，请稍后刷新查看'
-      }
+    if (unlockRes?.result?.success) {
+      return { success: true, message: successMessage, outTradeNo: payResult.outTradeNo }
+    }
+    return {
+      success: true,
+      message: '支付成功，内容解锁处理中，请稍后刷新查看',
+      outTradeNo: payResult.outTradeNo
     }
   } catch (err) {
     wx.hideLoading()
     return {
       success: true,
-      message: '支付成功，报告解锁中，请稍后刷新查看'
+      message: '支付成功，内容解锁处理中，请稍后刷新查看',
+      outTradeNo: payResult.outTradeNo
     }
   }
 }

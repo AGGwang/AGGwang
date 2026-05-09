@@ -1,24 +1,61 @@
-<!-- index.wxml -->
-<view class="container">
-  <view class="header">
-    <text class="title">AI 选科与职业规划</text>
-    <text class="subtitle">基于大数据与 AI 深度分析，为你定制未来</text>
+<view class="page footer-space">
+  <view class="hero">
+    <view class="topline">
+      <view class="badge"><view class="dot"></view><text>高考后决策助手</text></view>
+      <text class="top-note">首页</text>
+    </view>
+    <text class="hero-title">AI 辅助职业选择与志愿填报参考</text>
+    <text class="hero-desc">把分数、位次、选科、兴趣和性格转成更清晰的专业与职业方向。</text>
+    <view class="process">
+      <view class="process-item">
+        <text class="process-title">01 输入</text>
+        <text class="process-desc">成绩、位次、选科、路径</text>
+      </view>
+      <view class="process-item">
+        <text class="process-title">02 分析</text>
+        <text class="process-desc">职业、专业、院校取舍</text>
+      </view>
+      <view class="process-item">
+        <text class="process-title">03 复核</text>
+        <text class="process-desc">解锁报告或老师咨询</text>
+      </view>
+    </view>
   </view>
+
   <view class="content">
-    <view class="feature-item">
-      <t-icon name="location" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
-      <text class="desc">精准职业定位</text>
+    <button class="primary-btn" bindtap="startAssessment">开始职业与志愿分析</button>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">功能入口</text>
+        <text class="hint">精简主流程</text>
+      </view>
+      <view class="feature-grid">
+        <view class="feature">
+          <text class="feature-title">职业与志愿分析</text>
+          <text class="feature-desc">成绩、位次、兴趣、MBTI 与职业路径规划综合分析。</text>
+        </view>
+        <view class="feature">
+          <text class="feature-title">专业方向建议</text>
+          <text class="feature-desc">结合选科限制与就业方向，筛出适合的大类。</text>
+        </view>
+        <view class="feature">
+          <text class="feature-title">老师复核咨询</text>
+          <text class="feature-desc">复杂志愿表可添加老师 VX 继续判断风险。</text>
+        </view>
+        <view class="feature">
+          <text class="feature-title">历史记录</text>
+          <text class="feature-desc">登录后查看报告、订单和解锁状态。</text>
+        </view>
+      </view>
     </view>
-    <view class="feature-item">
-      <t-icon name="chart" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
-      <text class="desc">科学选科建议</text>
+
+    <view class="section warn">
+      <view class="section-head">
+        <text class="section-title">定位说明</text>
+        <text class="hint">首屏文案</text>
+      </view>
+      <text class="paragraph">结果用于职业选择与志愿填报参考，不替代官方招生计划、位次表和专业组规则。</text>
     </view>
-    <view class="feature-item">
-      <t-icon name="rocket" size="48rpx" style="margin-right: 20rpx; color: #0052d9;" />
-      <text class="desc">个性化成长路径</text>
-    </view>
-  </view>
-  <view class="footer">
-    <button class="start-btn" bindtap="startAssessment">开始评估</button>
   </view>
 </view>
