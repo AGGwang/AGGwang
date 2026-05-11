@@ -307,6 +307,10 @@
   padding: 8rpx 12rpx;
   text-align: center;
   font-weight: 800;
+  position: absolute;
+  top: 0;
+  right: 0;
+  max-width: 96rpx;
 }
 
 .status.unpaid {
@@ -314,25 +318,110 @@
   background: #fffbeb;
 }
 
-.search-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
+.date-divider {
+  display: flex;
+  align-items: center;
   gap: 16rpx;
-  margin-bottom: 20rpx;
+  margin: 28rpx 0 14rpx;
+  color: #64748b;
+  font-size: 24rpx;
+  font-weight: 700;
 }
 
-.search-input {
-  min-height: 76rpx;
-  border: 1rpx solid #d8e1ec;
-  border-radius: 16rpx;
-  background: #f8fafc;
-  padding: 0 20rpx;
-  color: #334155;
-  font-size: 26rpx;
+.date-divider::after {
+  content: "";
+  flex: 1;
+  height: 1rpx;
+  background: #edf2f7;
 }
 
-.record {
+.history-card {
+  padding: 22rpx 0;
+  border-top: 1rpx solid #edf2f7;
+}
+
+.date-divider + .history-card {
+  border-top: 0;
+}
+
+.history-top {
+  display: flex;
   align-items: flex-start;
+  gap: 18rpx;
+  position: relative;
+}
+
+.history-main {
+  flex: 1;
+  min-width: 0;
+  padding-right: 112rpx;
+}
+
+.history-title-row {
+  display: block;
+  min-width: 0;
+}
+
+.history-title {
+  display: -webkit-box;
+  max-width: 100%;
+  color: #172033;
+  font-size: 30rpx;
+  line-height: 1.35;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.history-time {
+  display: block;
+  margin-top: 4rpx;
+  color: #64748b;
+  font-size: 24rpx;
+}
+
+.history-meta,
+.history-ability,
+.history-summary {
+  display: block;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.history-meta {
+  margin-top: 8rpx;
+  color: #334155;
+  font-weight: 700;
+}
+
+.history-ability {
+  margin-top: 4rpx;
+}
+
+.history-summary {
+  margin: 14rpx 0 0 66rpx;
+  color: #64748b;
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin: 16rpx 0 0 66rpx;
+}
+
+.history-tag {
+  max-width: 100%;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 22rpx;
+  line-height: 1.3;
 }
 
 .empty-small,

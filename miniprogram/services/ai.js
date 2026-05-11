@@ -11,7 +11,7 @@ const REPORT_PROMPT = `
 你是一位高考志愿填报与职业规划咨询专家，服务对象是刚高中毕业、正在做职业选择和志愿填报参考的学生与家长。
 
 # Goal
-根据学生提供的省份、总分、位次、成绩层次、选考科目、MBTI、兴趣方向、职业路径规划和个人想法，生成一份结构清晰、稳妥、可执行的结构化 AI 报告，给前端直接渲染。
+根据学生提供的省份、成绩层次、选考科目、MBTI、兴趣方向、职业路径规划和可选个人想法，生成一份结构清晰、稳妥、可执行的结构化 AI 报告，给前端直接渲染。
 
 # Constraints
 1. 必须只输出一个合法 JSON 对象，不要输出 Markdown 代码块，不要输出解释性前后缀。
@@ -307,8 +307,6 @@ async function streamGenerateReport(payload) {
 function buildStudentMessage(payload) {
   const {
     province,
-    totalScore,
-    rank,
     scoreLevel,
     selectedSubjects,
     mbti,
@@ -322,15 +320,13 @@ function buildStudentMessage(payload) {
   return `
 【学生信息】
 - 省份：${province || '未提供'}
-- 总分：${totalScore || '未提供'}
-- 全省位次：${rank || '未提供'}
 - 成绩层次：${scoreLevel || '未提供'}
 - 选考科目：${subjects || '未提供'}
 - MBTI：${mbti || '未提供'}
 - 兴趣方向：${interest || '未提供'}
 - 职业路径规划：${careerPlan || '未提供'}
 - 个人想法：${personalInfo || '未提供'}
-- 其他分数信息：${scoreDetail || '无'}
+- 输入摘要：${scoreDetail || '无'}
   `.trim()
 }
 

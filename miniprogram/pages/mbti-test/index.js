@@ -96,10 +96,11 @@ Page({
 
   setQuestion(index) {
     const progress = Math.ceil(((index + 1) / QUESTIONS.length) * 4)
+    const answer = this.data.answers[index]
     this.setData({
       currentIndex: index,
       currentQuestion: QUESTIONS[index],
-      currentAnswer: this.data.answers[index],
+      currentAnswer: typeof answer === 'number' ? answer : null,
       progressBars: [0, 1, 2, 3].map(i => i < progress)
     })
   },

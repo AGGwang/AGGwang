@@ -3,6 +3,7 @@ const auth = require('../../services/auth')
 const payment = require('../../services/payment')
 
 const FREE_PREVIEW_LENGTH = 360
+const PAYMENT_DISABLED_FOR_TEST = true
 
 const EMPTY_REPORT = {
   coreConclusion: {
@@ -130,6 +131,256 @@ function joinList(list) {
   return (list || []).map((item) => `- ${item}`).join('\n')
 }
 
+function pickMatch(text, patterns) {
+  const source = String(text || '')
+  for (const pattern of patterns) {
+    const match = source.match(pattern)
+    if (match && match[1]) {
+      return match[1].trim()
+    }
+  }
+  return ''
+}
+
+function stripMarkdown(value) {
+  return String(value || '')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/^\s*[-*]\s+/gm, '· ')
+    .trim()
+}
+
+function cleanMarkdownLine(value) {
+  return stripMarkdown(value).replace(/^·\s*/, '').trim()
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const MARKDOWN_SECTION_TITLES = [
+  '职业选择与志愿填报参考方案',
+  '核心结论',
+  '推荐职业方向',
+  '适配专业大类',
+  '具体工作内容',
+  '职业收入估计',
+  '后续职业发展规划',
+  '志愿填报策略',
+  '风险提醒与人工复核点',
+  'AI完整报告',
+  'AI 完整报告'
+]
+
+const CAREER_BLOCK_TITLES = [
+  '对应专业大类',
+  '具体工作内容',
+  '核心能力要求',
+  '大学期间准备',
+  '职业收入估计',
+  '可行路径',
+  '谨慎点'
+]
+
+function extractMarkdownSection(text, title) {
+  const source = String(text || '')
+  const nextTitles = MARKDOWN_SECTION_TITLES
+    .filter((item) => item !== title)
+    .map(escapeRegExp)
+    .join('|')
+  const pattern = new RegExp(
+    `^\\s*(?:#{1,6}\\s*)?${escapeRegExp(title)}\\s*$\\n?([\\s\\S]*?)(?=^\\s*(?:#{1,6}\\s*)?(?:${nextTitles})\\s*$|(?![\\s\\S]))`,
+    'm'
+  )
+  const match = source.match(pattern)
+  return match ? match[1].trim() : ''
+}
+
+function splitMarkdownList(value) {
+  return String(value || '')
+    .split(/\r?\n/)
+    .map((line) => cleanMarkdownLine(line))
+    .filter(Boolean)
+}
+
+function parseLabelItems(section) {
+  const lines = splitMarkdownList(section)
+  if (lines.length > 0 && lines.every((line) => !/[：:]/.test(line))) {
+    return [{ label: '推荐专业', items: lines }]
+  }
+  return lines.map((line) => {
+    const parts = line.split(/[：:]/)
+    if (parts.length < 2) {
+      return { label: line, items: [] }
+    }
+    return {
+      label: parts.shift().trim(),
+      items: parts.join('：').split(/[、,，]/).map((item) => item.trim()).filter(Boolean)
+    }
+  }).filter((item) => item.label)
+}
+
+function extractBoldBlock(block, title) {
+  const nextTitles = CAREER_BLOCK_TITLES
+    .filter((item) => item !== title)
+    .map(escapeRegExp)
+    .join('|')
+  const pattern = new RegExp(
+    `(?:^|\\n)\\s*(?:\\*\\*)?${escapeRegExp(title)}(?:\\*\\*)?\\s*\\n?([\\s\\S]*?)(?=\\n\\s*(?:\\*\\*)?(?:${nextTitles})(?:\\*\\*)?\\s*(?:\\n|$)|(?![\\s\\S]))`
+  )
+  const match = String(block || '').match(pattern)
+  return match ? match[1].trim() : ''
+}
+
+function extractCareerDesc(block) {
+  return cleanMarkdownLine(
+    String(block || '')
+      .replace(/^\s*(?:###\s*)?\d+[.、]\s*.*$/m, '')
+      .split(new RegExp(`\\n\\s*(?:\\*\\*)?(?:${CAREER_BLOCK_TITLES.map(escapeRegExp).join('|')})(?:\\*\\*)?`))[0]
+  )
+}
+
+function buildReportFromMarkdown(fullContent) {
+  const source = String(fullContent || '').trim()
+  if (!source) return null
+
+  const coreSection = extractMarkdownSection(source, '核心结论')
+  const coreLines = splitMarkdownList(coreSection)
+  const title = coreLines[0] || '职业选择与志愿填报参考方案'
+  const summary = coreLines.slice(1).join('\n') || title
+
+  const careerSection = extractMarkdownSection(source, '推荐职业方向')
+  const careerBlocks = careerSection
+    .split(/(?=^\s*(?:###\s*)?\d+[.、]\s*)/m)
+    .map((block) => block.trim())
+    .filter(Boolean)
+
+  const careerOptions = careerBlocks.map((block, index) => {
+    const header = block.match(/^\s*(?:###\s*)?(\d+)[.、]\s*([^（\n]+)(?:（([^）]+)）)?/m)
+    const desc = extractCareerDesc(block)
+    const incomeLines = splitMarkdownList(extractBoldBlock(block, '职业收入估计'))
+    const incomeMap = incomeLines.reduce((map, line) => {
+      if (line.includes('1-3')) map.early = line.replace(/^.*?[：:]/, '').trim()
+      if (line.includes('3-5')) map.middle = line.replace(/^.*?[：:]/, '').trim()
+      if (line.includes('成熟')) map.mature = line.replace(/^.*?[：:]/, '').trim()
+      if (line.includes('差异')) map.note = line.replace(/^.*?[：:]/, '').trim()
+      return map
+    }, {})
+
+    return {
+      rank: Number(header?.[1]) || index + 1,
+      name: (header?.[2] || `推荐方向 ${index + 1}`).trim(),
+      match: header?.[3] || '',
+      percent: clampScore(String(header?.[3] || '').replace('%', '')) || 70,
+      desc: desc || summary,
+      majorCategories: splitMarkdownList(extractBoldBlock(block, '对应专业大类')),
+      workContent: splitMarkdownList(extractBoldBlock(block, '具体工作内容')),
+      requiredAbilities: splitMarkdownList(extractBoldBlock(block, '核心能力要求')),
+      collegePreparation: splitMarkdownList(extractBoldBlock(block, '大学期间准备')),
+      income: {
+        early: incomeMap.early || '',
+        middle: incomeMap.middle || '',
+        mature: incomeMap.mature || '',
+        note: incomeMap.note || ''
+      },
+      path: stripMarkdown(extractBoldBlock(block, '可行路径')),
+      caution: stripMarkdown(extractBoldBlock(block, '谨慎点'))
+    }
+  })
+
+  const majorGroups = parseLabelItems(extractMarkdownSection(source, '适配专业大类'))
+  const strategy = splitMarkdownList(extractMarkdownSection(source, '志愿填报策略')).map((line) => {
+    const parts = line.split(/[：:]/)
+    const label = (parts.shift() || '').trim()
+    const styleMap = { 冲: 'rush', 稳: 'stable', 保: 'safe' }
+    return { label, style: styleMap[label] || '', text: parts.join('：').trim() }
+  }).filter((item) => item.label || item.text)
+  const roadmap = splitMarkdownList(extractMarkdownSection(source, '后续职业发展规划')).map((line) => {
+    const parts = line.split(/[：:]/)
+    return { stage: (parts.shift() || '').trim(), text: parts.join('：').trim() }
+  }).filter((item) => item.stage || item.text)
+  const riskWarnings = splitMarkdownList(extractMarkdownSection(source, '风险提醒与人工复核点'))
+
+  if (!coreSection && careerOptions.length === 0 && majorGroups.length === 0 && strategy.length === 0 && roadmap.length === 0 && riskWarnings.length === 0) {
+    return null
+  }
+
+  const primaryCareer = careerOptions[0] || {}
+  return {
+    coreConclusion: { title, summary },
+    scoreRows: [
+      { label: '专业适配', score: 70, reason: primaryCareer.desc || summary },
+      { label: '录取可行', score: 70, reason: riskWarnings[0] || summary },
+      { label: '就业延展', score: 70, reason: primaryCareer.path || summary }
+    ],
+    careerOptions,
+    majorGroups,
+    jobDetails: [
+      { label: '日常任务', text: (primaryCareer.workContent || []).join('；') },
+      { label: '核心能力', text: (primaryCareer.requiredAbilities || []).join('；') },
+      { label: '大学积累', text: (primaryCareer.collegePreparation || []).join('；') },
+      { label: '适合原因', text: primaryCareer.desc || summary }
+    ].filter((item) => item.text),
+    incomeEstimates: [
+      { stage: '毕业 1-3 年', range: primaryCareer.income?.early || '', note: primaryCareer.income?.note || '' },
+      { stage: '毕业 3-5 年', range: primaryCareer.income?.middle || '', note: primaryCareer.income?.note || '' },
+      { stage: '成熟阶段', range: primaryCareer.income?.mature || '', note: primaryCareer.income?.note || '' }
+    ].filter((item) => item.range || item.note),
+    roadmap,
+    strategy,
+    riskWarnings,
+    fullReportMarkdown: source
+  }
+}
+
+function normalizeRecordFields(data, fullContent) {
+  const source = [
+    data.scoreDetail,
+    data.score,
+    data.personalInfo,
+    fullContent
+  ].filter(Boolean).join('\n')
+
+  return {
+    ...data,
+    scoreLevel: data.scoreLevel || data.collegeLevel || pickMatch(source, [
+      /成绩层次[:：]\s*([^,，。\n]+)/,
+      /层次[:：]\s*([^,，。\n]+)/,
+      /处于([^,，。\n]+?附近)/,
+      /(重点线附近|本科线附近|特殊线附近|985\/211附近|专科层次)/
+    ]),
+    careerPlan: data.careerPlan || pickMatch(source, [
+      /职业路径规划[:：]\s*([^,，。\n]+)/,
+      /路径[:：]\s*([^,，。\n]+)/,
+      /(本科就业|考研深造|考公考编|出国留学)/
+    ]),
+    mbti: data.mbti || pickMatch(source, [
+      /MBTI[:：]\s*([A-Za-z]{4})/,
+      /MBTI为\s*([A-Za-z]{4})/
+    ]).toUpperCase(),
+    interest: data.interest || pickMatch(source, [
+      /兴趣方向[:：]\s*([^,，。\n]+)/,
+      /兴趣[:：]\s*([^,，。\n]+)/,
+      /兴趣偏向([^,，。\n]+)/
+    ])
+  }
+}
+
+function getStoredStructuredReport(data) {
+  if (data.structuredReport) {
+    return data.structuredReport
+  }
+  return getRawStructuredReport(data)
+}
+
+function getRawStructuredReport(data) {
+  if (!data.rawAiContent) {
+    return null
+  }
+  const parsed = aiService.parseReportResponse(data.rawAiContent)
+  return parsed.structuredReport || null
+}
+
 function buildFullReportMarkdown(report) {
   const careers = report.careerOptions.map((career) => `
 ### ${career.rank}. ${career.name}（${career.match}）
@@ -199,6 +450,7 @@ ${joinList(report.riskWarnings)}
 
 Page({
   data: {
+    paymentDisabled: PAYMENT_DISABLED_FOR_TEST,
     recordId: '',
     record: {
       targetCareer: '职业与志愿分析',
@@ -207,6 +459,7 @@ Page({
     },
     report: EMPTY_REPORT,
     primaryCareerName: '',
+    legacyReport: false,
     isPaid: false,
     generating: false,
     loading: true,
@@ -325,6 +578,7 @@ Page({
       errorMessage: message,
       report: EMPTY_REPORT,
       primaryCareerName: '',
+      legacyReport: false,
       displayText: ''
     })
     wx.showModal({
@@ -337,7 +591,7 @@ Page({
 
   buildDisplayText(fullContent, isPaid) {
     if (!fullContent) return ''
-    if (isPaid) return fullContent
+    if (PAYMENT_DISABLED_FOR_TEST || isPaid) return fullContent
     return fullContent.length > FREE_PREVIEW_LENGTH
       ? `${fullContent.substring(0, FREE_PREVIEW_LENGTH)}...`
       : fullContent
@@ -348,22 +602,64 @@ Page({
     try {
       const res = await db.collection('records').doc(id).get()
       const data = res.data
-      const report = this.normalizeReport(data.structuredReport)
-      const fullContent = data.fullContent || report.fullReportMarkdown
+      let report = EMPTY_REPORT
+      let legacyReport = false
+      let fullContent = data.fullContent || data.summary || ''
+
+      const storedStructuredReport = getStoredStructuredReport(data)
+      if (storedStructuredReport) {
+        try {
+          report = this.normalizeReport(storedStructuredReport)
+          fullContent = data.fullContent || report.fullReportMarkdown
+        } catch (err) {
+          const rawStructuredReport = data.structuredReport ? getRawStructuredReport(data) : null
+          if (rawStructuredReport) {
+            try {
+              report = this.normalizeReport(rawStructuredReport)
+              fullContent = data.fullContent || report.fullReportMarkdown
+            } catch (rawErr) {
+              console.warn('历史报告原始结构化数据也不可用', rawErr)
+            }
+          }
+          if (report !== EMPTY_REPORT) {
+            legacyReport = false
+          } else {
+            if (!fullContent) {
+              throw err
+            }
+            console.warn('历史报告结构化数据不可用，使用旧版正文展示', err)
+            legacyReport = true
+          }
+        }
+      } else if (fullContent) {
+        legacyReport = true
+      }
+
       if (!fullContent) {
         throw new Error('历史记录缺少AI完整报告正文')
       }
+      if (legacyReport) {
+        const markdownReport = buildReportFromMarkdown(fullContent)
+        if (markdownReport) {
+          report = markdownReport
+          legacyReport = false
+        }
+      }
+      const record = normalizeRecordFields(data, fullContent)
+      const displayContent = legacyReport ? stripMarkdown(fullContent) : fullContent
+      const effectiveIsPaid = PAYMENT_DISABLED_FOR_TEST || !!data.isPaid
       this.setData({
         record: {
-          ...data,
+          ...record,
           fullContent,
-          price: data.price || 5.99,
-          originalPrice: data.originalPrice || 19.9
+          price: record.price || 5.99,
+          originalPrice: record.originalPrice || 19.9
         },
         report,
         primaryCareerName: report.careerOptions[0]?.name || '',
-        isPaid: !!data.isPaid,
-        displayText: this.buildDisplayText(fullContent, !!data.isPaid),
+        legacyReport,
+        isPaid: effectiveIsPaid,
+        displayText: this.buildDisplayText(displayContent, effectiveIsPaid),
         loading: false,
         generating: false,
         errorMessage: ''
@@ -393,6 +689,7 @@ Page({
       },
       report: EMPTY_REPORT,
       primaryCareerName: '',
+      legacyReport: false,
       displayText: 'AI正在生成结构化报告，请稍候...'
     })
 
@@ -475,14 +772,15 @@ Page({
           targetCareer: '职业与志愿分析',
           fullContent,
           summary,
-          isPaid: false,
+          isPaid: PAYMENT_DISABLED_FOR_TEST,
           price: 5.99,
           originalPrice: 19.9
         },
         report,
         primaryCareerName: report.careerOptions[0]?.name || '',
-        isPaid: false,
-        displayText: this.buildDisplayText(fullContent, false),
+        legacyReport: false,
+        isPaid: PAYMENT_DISABLED_FOR_TEST,
+        displayText: this.buildDisplayText(fullContent, PAYMENT_DISABLED_FOR_TEST),
         generating: false,
         loading: false,
         errorMessage: ''
@@ -494,6 +792,15 @@ Page({
   },
 
   async handlePay() {
+    if (PAYMENT_DISABLED_FOR_TEST) {
+      this.setData({
+        isPaid: true,
+        displayText: this.buildDisplayText(this.data.record.fullContent || this.data.displayText, true)
+      })
+      wx.showToast({ title: '测试模式已解锁', icon: 'none' })
+      return
+    }
+
     if (!this.data.recordId) {
       wx.showToast({ title: '记录ID不存在', icon: 'none' })
       return

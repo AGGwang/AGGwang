@@ -118,7 +118,7 @@ Page({
 
     const selectedSubjects = subjects.filter(item => item.selected).map(item => item.name)
 
-    if (!province || !totalScore || !rank || !scoreLevel) {
+    if (!province || !scoreLevel) {
       wx.showToast({ title: '请完善高考基础信息', icon: 'none' })
       return
     }
@@ -128,8 +128,8 @@ Page({
       return
     }
 
-    if (!mbti || !interest || !personalInfo) {
-      wx.showToast({ title: '请完善性格兴趣和个人想法', icon: 'none' })
+    if (!mbti || !interest) {
+      wx.showToast({ title: '请完善性格兴趣', icon: 'none' })
       return
     }
 
@@ -146,7 +146,7 @@ Page({
         interest,
         careerPlan,
         personalInfo,
-        scoreDetail: `省份:${province}, 总分:${totalScore}, 位次:${rank}, 层次:${scoreLevel}, 选科:${selectedSubjects.join('+')}, MBTI:${mbti.toUpperCase()}, 兴趣:${interest}, 路径:${careerPlan}`
+        scoreDetail: `省份:${province}, 层次:${scoreLevel}, 选科:${selectedSubjects.join('+')}, MBTI:${mbti.toUpperCase()}, 兴趣:${interest}, 路径:${careerPlan}`
       }))
       wx.navigateTo({ url: `/pages/result/result?payload=${payload}` })
     } catch (err) {

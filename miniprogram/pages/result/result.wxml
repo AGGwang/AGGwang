@@ -1,4 +1,4 @@
-<view class="page footer-space">
+<view class="page {{paymentDisabled ? '' : 'footer-space'}}">
   <view class="hero compact">
     <view class="topline">
       <view class="badge">
@@ -8,7 +8,7 @@
       <text class="top-note">{{generating ? '生成中' : (errorMessage ? '需重试' : '职业结果')}}</text>
     </view>
     <text class="hero-title">{{generating ? '正在生成职业与志愿填报参考方案' : (errorMessage ? '报告生成或解析失败' : '职业选择与志愿填报参考方案')}}</text>
-    <text class="hero-desc">{{generating ? '正在结合分数、位次、选科、MBTI、兴趣和职业路径规划。请不要退出页面。' : (errorMessage ? '本页不会使用前端默认假数据兜底，请返回修改信息后重新生成。' : '以下内容由 AI 根据本次填写的信息生成，仅作为职业选择和志愿填报参考。')}}</text>
+    <text class="hero-desc">{{generating ? '正在结合省份、成绩层次、选科、MBTI、兴趣和职业路径规划。请不要退出页面。' : (errorMessage ? '本页不会使用前端默认假数据兜底，请返回修改信息后重新生成。' : '以下内容由 AI 根据本次填写的信息生成，仅作为职业选择和志愿填报参考。')}}</text>
   </view>
 
   <view class="content" wx:if="{{loading}}">
@@ -35,7 +35,7 @@
         <view class="mark">1</view>
         <view>
           <text class="row-title">读取基础信息</text>
-          <text class="row-desc">省份、总分、位次、成绩层次、选考科目。</text>
+          <text class="row-desc">省份、成绩层次、选考科目。</text>
         </view>
         <text class="state-label">处理中</text>
       </view>
@@ -43,7 +43,7 @@
         <view class="mark">2</view>
         <view>
           <text class="row-title">匹配职业与专业</text>
-          <text class="row-desc">结合 MBTI、兴趣、职业路径规划和个人想法。</text>
+          <text class="row-desc">结合 MBTI、兴趣、职业路径规划和可选个人想法。</text>
         </view>
         <text class="state-label">处理中</text>
       </view>
@@ -92,6 +92,17 @@
       </view>
     </view>
 
+    <block wx:if="{{legacyReport}}">
+      <view class="section">
+        <view class="section-head">
+          <text class="section-title">AI 完整报告</text>
+          <text class="hint">{{isPaid ? '已解锁' : '预览'}}</text>
+        </view>
+        <text class="report-text">{{displayText}}</text>
+      </view>
+    </block>
+
+    <block wx:else>
     <view class="section">
       <view class="section-head">
         <text class="section-title">核心结论</text>
@@ -263,6 +274,7 @@
       </view>
       <text class="report-text">{{displayText}}</text>
     </view>
+    </block>
 
     <view class="section dark" wx:if="{{isPaid}}">
       <view class="section-head">
@@ -274,7 +286,7 @@
     </view>
   </view>
 
-  <view class="bottom" wx:if="{{!isPaid && !generating && !loading && !errorMessage}}">
+  <view class="bottom" wx:if="{{!paymentDisabled && !isPaid && !generating && !loading && !errorMessage}}">
     <view>
       <text class="bottom-title">解锁完整报告</text>
       <text class="bottom-desc">查看完整路径、收入、工作内容与专业组风险分析。</text>

@@ -55,23 +55,34 @@
     <view class="section">
       <view class="section-head">
         <text class="section-title">历史记录</text>
-        <text class="hint">可搜索</text>
-      </view>
-      <view class="search-row">
-        <input class="search-input" placeholder="搜索职业方向 / MBTI / 路径规划" value="{{historyKeyword}}" bindinput="onHistoryKeywordInput" bindconfirm="handleHistorySearch" />
-        <button class="search-btn" bindtap="handleHistorySearch">搜索</button>
+        <text class="hint">{{historyHint}}</text>
       </view>
 
       <view wx:if="{{historyRecords.length === 0 && !historyLoading}}" class="empty-small">暂无历史记录</view>
       <block wx:else>
-        <view class="row-item record" wx:for="{{historyRecords}}" wx:key="_id" bindtap="goToHistoryDetail" data-record-type="{{item.recordType}}" data-source-id="{{item.sourceId}}">
-          <view class="mark">职</view>
-          <view>
-            <text class="row-title">{{item.title}}</text>
-            <text class="row-desc">{{item.timeStr}}</text>
+        <block wx:for="{{historyRecords}}" wx:key="_id">
+          <view class="date-divider" wx:if="{{item.showDateGroup}}">
+            <text>{{item.dateGroup}}</text>
           </view>
-          <text class="status {{item.isPaid ? '' : 'unpaid'}}">{{item.statusText}}</text>
-        </view>
+          <view class="history-card" bindtap="goToHistoryDetail" data-record-type="{{item.recordType}}" data-source-id="{{item.sourceId}}">
+            <view class="history-top">
+              <view class="mark">职</view>
+              <view class="history-main">
+                <view class="history-title-row">
+                  <text class="history-title">{{item.title}}</text>
+                  <text class="history-time">{{item.timeShort}}</text>
+                </view>
+                <text class="history-meta">{{item.metaLine}}</text>
+                <text class="history-ability" wx:if="{{item.abilityLine}}">{{item.abilityLine}}</text>
+              </view>
+              <text class="status {{item.isPaid ? '' : 'unpaid'}}">{{item.statusText}}</text>
+            </view>
+            <text class="history-summary" wx:if="{{item.summarySnippet}}">{{item.summarySnippet}}</text>
+            <view class="history-tags" wx:if="{{item.inputTags.length}}">
+              <text class="history-tag" wx:for="{{item.inputTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+          </view>
+        </block>
       </block>
 
       <view class="list-footer" wx:if="{{historyLoading}}">加载中...</view>

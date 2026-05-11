@@ -6,8 +6,7 @@
     "pages/result/result",
     "pages/mine/mine",
     "pages/contact/contact",
-    "pages/order/order",
-    "pages/logs/logs"
+    "pages/order/order"
   ],
   "window": {
     "navigationBarTextStyle": "black",
